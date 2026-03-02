@@ -75,8 +75,8 @@ export default function RegistrationPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
           className="flex flex-col justify-center items-center text-center
-                     bg-gradient-to-br from-[#2b4bee] to-[#1f36b8]
-                     text-white p-12"
+                     bg-primary
+                     text-secondary p-12"
         >
           <h2 className="text-4xl font-bold mb-4 text-yellow-300">
             Get Started
@@ -108,7 +108,7 @@ export default function RegistrationPage() {
           transition={{ duration: 0.4 }}
           className="p-10 md:p-12 flex flex-col justify-center"
         >
-          <h1 className="text-3xl font-semibold text-[#2b4bee] mb-8">
+          <h1 className="text-3xl font-semibold text-primary mb-8">
             Create Account
           </h1>
 
@@ -120,7 +120,7 @@ export default function RegistrationPage() {
                 type="button"
                 onClick={() => setRole(r)}
                 className={`px-4 py-1.5 text-xs rounded-full border transition ${role === r
-                  ? "bg-[#2b4bee] text-white border-[#2b4bee]"
+                  ? "bg-primary text-white border-primary"
                   : "text-gray-500 border-gray-300 hover:bg-gray-100"
                   }`}
               >
@@ -176,12 +176,12 @@ export default function RegistrationPage() {
             {/* ===== PROFILE IMAGE BELOW FORM ===== */}
             <div className="flex flex-col items-center gap-3 mt-8">
               <label className="cursor-pointer">
-                <div className="w-24 h-24 rounded-full border-2 border-dashed border-[#2b4bee]
+                <div className="w-24 h-24 rounded-full border-2 border-dashed border-primary
                               flex items-center justify-center overflow-hidden bg-[#eef1ff]">
                   {preview ? (
                     <img src={preview} alt="preview" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xs text-[#2b4bee]">Upload Photo</span>
+                    <span className="text-xs text-primary">Upload Photo</span>
                   )}
                 </div>
                 <input
@@ -193,7 +193,7 @@ export default function RegistrationPage() {
               </label>
 
               {uploading && (
-                <p className="text-xs text-[#2b4bee]">Uploading image...</p>
+                <p className="text-xs text-primary">Uploading image...</p>
               )}
             </div>
 
@@ -202,7 +202,7 @@ export default function RegistrationPage() {
               <input
                 type="checkbox"
                 {...register("terms", { required: true })}
-                className="accent-[#2b4bee]"
+                className="accent-primary"
               />
               I accept the terms of the agreement
             </label>
@@ -210,7 +210,7 @@ export default function RegistrationPage() {
               <p className="text-red-500 text-xs">You must accept terms</p>
             )}
 
-            <button className="w-full bg-[#2b4bee] text-white py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition">
+            <button className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition">
               Sign Up
             </button>
           </form>
