@@ -25,7 +25,7 @@ email:DEMO_EMAIL
 });
 
 
-/* MODAL STATES */
+/* MODAL */
 
 const [openModal,setOpenModal]=useState(false);
 const [step,setStep]=useState(1);
@@ -55,11 +55,11 @@ setFormData({
 };
 
 
-
 const handleSave=()=>{
-alert("Profile Saved");
-};
 
+alert("Profile Saved");
+
+};
 
 
 const handleCancel=()=>{
@@ -73,7 +73,7 @@ email:DEMO_EMAIL
 
 
 
-/* SEND OTP */
+/* OTP */
 
 const sendCode=()=>{
 
@@ -85,8 +85,6 @@ return;
 
 }
 
-/* Generate OTP */
-
 const otp=Math.floor(100000+Math.random()*900000);
 
 setGeneratedCode(String(otp));
@@ -94,29 +92,20 @@ setGeneratedCode(String(otp));
 alert("Demo OTP: "+otp);
 
 setStep(2);
+
 setTimer(60);
 
 };
 
 
 
-/* VERIFY OTP */
-
 const verifyCode=()=>{
-
-if(!generatedCode){
-
-alert("Generate code first");
-
-return;
-
-}
 
 if(code===generatedCode){
 
 setVerified(true);
 
-alert("Code Verified");
+alert("Verified");
 
 }else{
 
@@ -127,8 +116,6 @@ alert("Wrong Code");
 };
 
 
-
-/* SAVE PASSWORD */
 
 const savePassword=()=>{
 
@@ -147,8 +134,6 @@ closeModal();
 };
 
 
-
-/* CLOSE MODAL */
 
 const closeModal=()=>{
 
@@ -170,7 +155,7 @@ setNewPassword("");
 
 
 
-/* COUNTDOWN */
+/* TIMER */
 
 useEffect(()=>{
 
@@ -197,13 +182,13 @@ return(
 
 {/* HEADER */}
 
-<div className="bg-slate-900 p-8 rounded-[3rem] text-white shadow-xl">
+<div className="bg-white p-8 rounded-3xl border shadow-sm">
 
-<h1 className="text-3xl font-black">
+<h1 className="text-3xl font-bold text-gray-800">
 Admin Profile & Settings
 </h1>
 
-<p className="text-slate-400 text-sm mt-2">
+<p className="text-gray-500 mt-2">
 Manage profile and account settings
 </p>
 
@@ -211,64 +196,86 @@ Manage profile and account settings
 
 
 
-{/* PROFILE */}
+{/* PROFILE CARD */}
 
-<div className="bg-white p-10 rounded-[3rem] border shadow-sm">
+<div className="bg-white p-10 rounded-3xl border shadow-sm">
 
 
 <div className="flex flex-col items-center text-center">
+
 
 <Image
 src="https://i.pravatar.cc/150?img=12"
 width={120}
 height={120}
 alt="Profile"
-className="rounded-full border-4 border-gray-200"
+className="rounded-full border"
 />
 
-<h2 className="text-2xl font-black mt-4">
+
+<h2 className="text-2xl font-bold mt-4">
 {formData.name}
 </h2>
+
 
 <p className="text-gray-500">
 {formData.email}
 </p>
 
+
 </div>
 
 
+
+{/* INFO CARDS */}
 
 <div className="grid md:grid-cols-3 gap-4 mt-8">
 
-<div className="border p-4 rounded-xl flex gap-3">
+
+<div className="bg-gray-50 p-4 rounded-xl flex gap-3 items-center">
+
 <LuUser/>
+
 {formData.name}
+
 </div>
 
-<div className="border p-4 rounded-xl flex gap-3">
+
+
+<div className="bg-gray-50 p-4 rounded-xl flex gap-3 items-center">
+
 <LuMail/>
+
 {formData.email}
+
 </div>
 
-<div className="border p-4 rounded-xl flex gap-3">
+
+
+<div className="bg-gray-50 p-4 rounded-xl flex gap-3 items-center">
+
 <LuShield/>
+
 Admin
-</div>
 
 </div>
 
 
+</div>
+
+
+
+{/* FORM */}
 
 <div className="mt-10 space-y-6">
 
 
-{/* NAME */}
-
 <div>
 
-<label className="text-sm font-bold">
+<label className="text-sm font-semibold">
 Admin Name
 </label>
+
 
 <div className="border p-3 rounded-xl flex gap-3 mt-2">
 
@@ -287,13 +294,12 @@ className="w-full outline-none"
 
 
 
-{/* EMAIL */}
-
 <div>
 
-<label className="text-sm font-bold">
+<label className="text-sm font-semibold">
 Email
 </label>
+
 
 <div className="border p-3 rounded-xl flex gap-3 mt-2">
 
@@ -319,40 +325,52 @@ className="w-full outline-none"
 
 <button
 onClick={handleSave}
-className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold flex gap-2"
+className="bg-blue-900 text-white px-6 py-3 rounded-xl font-semibold flex gap-2"
 >
+
 <LuSave/>
+
 Save
+
 </button>
+
 
 
 <button
 onClick={handleCancel}
-className="bg-gray-200 px-6 py-3 rounded-xl font-bold flex gap-2"
+className="bg-gray-200 px-6 py-3 rounded-xl font-semibold flex gap-2"
 >
+
 <LuX/>
+
 Cancel
+
 </button>
+
 
 
 <button
 onClick={()=>setOpenModal(true)}
-className="bg-black text-white px-6 py-3 rounded-xl font-bold flex gap-2"
+className="bg-black text-white px-6 py-3 rounded-xl font-semibold flex gap-2"
 >
+
 <LuLock/>
+
 Change Password
+
 </button>
 
-</div>
-
-
-</div>
 
 </div>
 
 
+</div>
 
-{/* MODAL */}
+</div>
+
+
+
+{/* PASSWORD MODAL */}
 
 {openModal&&(
 
@@ -360,21 +378,25 @@ Change Password
 
 <div className="bg-white p-8 rounded-3xl w-[420px] space-y-6 shadow-xl">
 
-<h2 className="text-xl font-black">
+
+<h2 className="text-xl font-bold">
 Reset Password
 </h2>
 
 
 
-{/* EMAIL */}
+{/* STEP 1 */}
 
 {step===1&&(
 
 <>
 
 <p className="text-sm text-gray-500">
+
 Demo Email: admin@system.com
+
 </p>
+
 
 <div className="border p-3 rounded-xl flex gap-3">
 
@@ -389,11 +411,14 @@ className="w-full outline-none"
 
 </div>
 
+
 <button
 onClick={sendCode}
-className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
+className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold"
 >
+
 Get Code
+
 </button>
 
 </>
@@ -402,7 +427,7 @@ Get Code
 
 
 
-{/* OTP */}
+{/* STEP 2 */}
 
 {step===2&&!verified&&(
 
@@ -430,7 +455,7 @@ className="w-full outline-none"
 
 :
 
-<button onClick={sendCode} className="text-blue-600">
+<button onClick={sendCode} className="text-blue-900">
 Resend Code
 </button>
 
@@ -441,9 +466,11 @@ Resend Code
 
 <button
 onClick={verifyCode}
-className="w-full bg-green-600 text-white py-3 rounded-xl font-bold"
+className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold"
 >
+
 Verify Code
+
 </button>
 
 </>
@@ -452,7 +479,7 @@ Verify Code
 
 
 
-{/* PASSWORD */}
+{/* STEP 3 */}
 
 {verified&&(
 
@@ -466,17 +493,20 @@ Verify Code
 type="password"
 value={newPassword}
 onChange={(e)=>setNewPassword(e.target.value)}
-placeholder="Enter New Password"
+placeholder="New Password"
 className="w-full outline-none"
 />
 
 </div>
 
+
 <button
 onClick={savePassword}
-className="w-full bg-black text-white py-3 rounded-xl font-bold"
+className="w-full bg-black text-white py-3 rounded-xl font-semibold"
 >
+
 Save Password
+
 </button>
 
 </>
@@ -487,9 +517,11 @@ Save Password
 
 <button
 onClick={closeModal}
-className="w-full bg-gray-200 py-3 rounded-xl font-bold"
+className="w-full bg-gray-200 py-3 rounded-xl font-semibold"
 >
+
 Close
+
 </button>
 
 
@@ -498,7 +530,6 @@ Close
 </div>
 
 )}
-
 
 
 </div>

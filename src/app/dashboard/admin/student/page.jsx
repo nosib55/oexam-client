@@ -5,12 +5,14 @@ import {
   LuSearch,
   LuEye,
   LuTrash2,
-  LuUsers
+  LuUsers,
+  LuX
 } from "react-icons/lu";
 
 export default function StudentPage() {
 
   const [search, setSearch] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   const students = [
     {
@@ -19,6 +21,9 @@ export default function StudentPage() {
       email: "rahim@gmail.com",
       institution: "Ideal School",
       status: "Active",
+      phone: "01700000001",
+      class: "10",
+      address: "Dhaka"
     },
     {
       id: 2,
@@ -26,6 +31,9 @@ export default function StudentPage() {
       email: "karim@gmail.com",
       institution: "Scholars School",
       status: "Inactive",
+      phone: "01700000002",
+      class: "9",
+      address: "Dhaka"
     },
     {
       id: 3,
@@ -33,14 +41,10 @@ export default function StudentPage() {
       email: "nusrat@gmail.com",
       institution: "Green Field School",
       status: "Active",
-    },
-    {
-      id: 4,
-      name: "Sabbir Hossain",
-      email: "sabbir@gmail.com",
-      institution: "Sunrise School",
-      status: "Active",
-    },
+      phone: "01700000003",
+      class: "8",
+      address: "Dhaka"
+    }
   ];
 
 
@@ -56,19 +60,15 @@ export default function StudentPage() {
 
       {/* Header */}
 
-      <div className="bg-slate-900 p-8 rounded-[3rem] text-white shadow-xl">
+      <div className="bg-white p-8 rounded-3xl border shadow-sm">
 
-        <div>
+        <h1 className="text-3xl font-bold text-gray-800">
+          Student Management
+        </h1>
 
-          <h1 className="text-3xl font-black">
-            Student Management
-          </h1>
-
-          <p className="text-slate-400 text-sm">
-            Manage all registered students
-          </p>
-
-        </div>
+        <p className="text-gray-500 mt-2">
+          Manage all registered students
+        </p>
 
       </div>
 
@@ -76,11 +76,11 @@ export default function StudentPage() {
 
       {/* Search */}
 
-      <div className="bg-white p-6 rounded-3xl shadow-sm border">
+      <div className="bg-white p-6 rounded-3xl border shadow-sm">
 
         <div className="flex items-center gap-3">
 
-          <LuSearch size={20} />
+          <LuSearch size={20} className="text-gray-500"/>
 
           <input
             type="text"
@@ -98,13 +98,13 @@ export default function StudentPage() {
 
       {/* Table */}
 
-      <div className="bg-white rounded-[3rem] border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border shadow-sm overflow-hidden">
 
         <div className="p-8 border-b flex items-center gap-3">
 
-          <LuUsers size={20} />
+          <LuUsers size={22}/>
 
-          <h2 className="font-black">
+          <h2 className="font-semibold text-lg">
             Student List
           </h2>
 
@@ -117,14 +117,11 @@ export default function StudentPage() {
 
             <thead>
 
-              <tr className="text-left text-xs uppercase text-gray-400">
+              <tr className="text-left text-sm text-gray-500 border-b">
 
                 <th className="p-6">Name</th>
-
                 <th>Email</th>
-
-                <th>School</th>
-
+                <th>Institution</th>
                 <th>Status</th>
 
                 <th className="text-right pr-8">
@@ -142,7 +139,7 @@ export default function StudentPage() {
 
                 <tr
                   key={student.id}
-                  className="border-t hover:bg-gray-50"
+                  className="border-b hover:bg-gray-50"
                 >
 
                   <td className="p-6 font-semibold">
@@ -163,13 +160,12 @@ export default function StudentPage() {
                   <td>
 
                     <span
-                      className={`px-3 py-1 rounded-lg text-xs font-bold
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold
+
                       ${
                         student.status === "Active"
-                        ?
-                        "bg-green-100 text-green-600"
-                        :
-                        "bg-red-100 text-red-600"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
                       }`}
                     >
                       {student.status}
@@ -180,11 +176,19 @@ export default function StudentPage() {
 
                   <td className="text-right pr-8 space-x-2">
 
-                    <button className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                    {/* View */}
+
+                    <button
+                      onClick={()=>setSelectedStudent(student)}
+                      className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                    >
                       <LuEye size={18}/>
                     </button>
 
-                    <button className="p-2 bg-red-50 text-red-600 rounded-lg">
+
+                    {/* Delete */}
+
+                    <button className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
                       <LuTrash2 size={18}/>
                     </button>
 
@@ -200,10 +204,106 @@ export default function StudentPage() {
 
         </div>
 
-
       </div>
 
-    </div>
 
+
+      {/* Student Details Modal */}
+
+      {selectedStudent && (
+
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+
+          <div className="bg-white w-[500px] rounded-3xl p-8 shadow-xl">
+
+            {/* Header */}
+
+            <div className="flex justify-between mb-6">
+
+              <h2 className="text-xl font-bold">
+                Student Details
+              </h2>
+
+              <button
+                onClick={()=>setSelectedStudent(null)}
+              >
+                <LuX size={22}/>
+              </button>
+
+            </div>
+
+
+            {/* Details */}
+
+            <div className="space-y-4 text-gray-700">
+
+              <div>
+                <span className="font-semibold">Name:</span>
+                {" "}
+                {selectedStudent.name}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Email:</span>
+                {" "}
+                {selectedStudent.email}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Institution:</span>
+                {" "}
+                {selectedStudent.institution}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Phone:</span>
+                {" "}
+                {selectedStudent.phone}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Class:</span>
+                {" "}
+                {selectedStudent.class}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Address:</span>
+                {" "}
+                {selectedStudent.address}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Status:</span>
+                {" "}
+                {selectedStudent.status}
+              </div>
+
+            </div>
+
+
+            <button
+              onClick={()=>setSelectedStudent(null)}
+              className="mt-6 w-full bg-blue-900 text-white py-3 rounded-xl font-semibold"
+            >
+              Close
+            </button>
+
+
+          </div>
+
+        </div>
+
+      )}
+
+
+    </div>
   );
 }

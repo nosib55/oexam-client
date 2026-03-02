@@ -5,12 +5,14 @@ import {
   LuSearch,
   LuEye,
   LuTrash2,
-  LuUserCheck
+  LuUserCheck,
+  LuX
 } from "react-icons/lu";
 
 export default function TeacherPage() {
 
   const [search, setSearch] = useState("");
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
 
   const teachers = [
     {
@@ -20,6 +22,8 @@ export default function TeacherPage() {
       institution: "Ideal School",
       location: "Dhaka",
       status: "Active",
+      phone: "01700000001",
+      subject: "Mathematics"
     },
     {
       id: 2,
@@ -28,6 +32,8 @@ export default function TeacherPage() {
       institution: "Sunrise School",
       location: "Narayanganj",
       status: "Inactive",
+      phone: "01700000002",
+      subject: "English"
     },
     {
       id: 3,
@@ -36,15 +42,9 @@ export default function TeacherPage() {
       institution: "Green Field School",
       location: "Gazipur",
       status: "Active",
-    },
-    {
-      id: 4,
-      name: "Mahmud Islam",
-      email: "mahmud@gmail.com",
-      institution: "Scholars School",
-      location: "Dhaka",
-      status: "Active",
-    },
+      phone: "01700000003",
+      subject: "Science"
+    }
   ];
 
 
@@ -60,19 +60,15 @@ export default function TeacherPage() {
 
       {/* Header */}
 
-      <div className="bg-slate-900 p-8 rounded-[3rem] text-white shadow-xl">
+      <div className="bg-white p-8 rounded-3xl border shadow-sm">
 
-        <div>
+        <h1 className="text-3xl font-bold text-gray-800">
+          Teacher Management
+        </h1>
 
-          <h1 className="text-3xl font-black">
-            Teacher Management
-          </h1>
-
-          <p className="text-slate-400 text-sm">
-            Manage all registered teachers
-          </p>
-
-        </div>
+        <p className="text-gray-500 mt-2">
+          Manage all registered teachers
+        </p>
 
       </div>
 
@@ -80,11 +76,11 @@ export default function TeacherPage() {
 
       {/* Search */}
 
-      <div className="bg-white p-6 rounded-3xl shadow-sm border">
+      <div className="bg-white p-6 rounded-3xl border shadow-sm">
 
         <div className="flex items-center gap-3">
 
-          <LuSearch size={20} />
+          <LuSearch size={20} className="text-gray-500"/>
 
           <input
             type="text"
@@ -102,13 +98,13 @@ export default function TeacherPage() {
 
       {/* Table */}
 
-      <div className="bg-white rounded-[3rem] border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border shadow-sm overflow-hidden">
 
         <div className="p-8 border-b flex items-center gap-3">
 
-          <LuUserCheck size={20} />
+          <LuUserCheck size={22}/>
 
-          <h2 className="font-black">
+          <h2 className="font-semibold text-lg">
             Teacher List
           </h2>
 
@@ -121,16 +117,12 @@ export default function TeacherPage() {
 
             <thead>
 
-              <tr className="text-left text-xs uppercase text-gray-400">
+              <tr className="text-left text-sm text-gray-500 border-b">
 
                 <th className="p-6">Name</th>
-
                 <th>Email</th>
-
-                <th>School</th>
-
+                <th>Institution</th>
                 <th>Location</th>
-
                 <th>Status</th>
 
                 <th className="text-right pr-8">
@@ -148,7 +140,7 @@ export default function TeacherPage() {
 
                 <tr
                   key={teacher.id}
-                  className="border-t hover:bg-gray-50"
+                  className="border-b hover:bg-gray-50"
                 >
 
                   <td className="p-6 font-semibold">
@@ -174,13 +166,12 @@ export default function TeacherPage() {
                   <td>
 
                     <span
-                      className={`px-3 py-1 rounded-lg text-xs font-bold
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold
+
                       ${
                         teacher.status === "Active"
-                        ?
-                        "bg-green-100 text-green-600"
-                        :
-                        "bg-red-100 text-red-600"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
                       }`}
                     >
                       {teacher.status}
@@ -191,12 +182,20 @@ export default function TeacherPage() {
 
                   <td className="text-right pr-8 space-x-2">
 
-                    <button className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+
+                    {/* View */}
+
+                    <button
+                      onClick={()=>setSelectedTeacher(teacher)}
+                      className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                    >
                       <LuEye size={18}/>
                     </button>
 
 
-                    <button className="p-2 bg-red-50 text-red-600 rounded-lg">
+                    {/* Delete */}
+
+                    <button className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
                       <LuTrash2 size={18}/>
                     </button>
 
@@ -213,6 +212,106 @@ export default function TeacherPage() {
         </div>
 
       </div>
+
+
+
+      {/* Teacher Details Modal */}
+
+      {selectedTeacher && (
+
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+
+          <div className="bg-white w-[500px] rounded-3xl p-8 shadow-xl">
+
+
+            {/* Header */}
+
+            <div className="flex justify-between mb-6">
+
+              <h2 className="text-xl font-bold">
+                Teacher Details
+              </h2>
+
+              <button
+                onClick={()=>setSelectedTeacher(null)}
+              >
+                <LuX size={22}/>
+              </button>
+
+            </div>
+
+
+
+            {/* Details */}
+
+            <div className="space-y-4 text-gray-700">
+
+              <div>
+                <span className="font-semibold">Name:</span>
+                {" "}
+                {selectedTeacher.name}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Email:</span>
+                {" "}
+                {selectedTeacher.email}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Institution:</span>
+                {" "}
+                {selectedTeacher.institution}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Location:</span>
+                {" "}
+                {selectedTeacher.location}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Phone:</span>
+                {" "}
+                {selectedTeacher.phone}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Subject:</span>
+                {" "}
+                {selectedTeacher.subject}
+              </div>
+
+
+              <div>
+                <span className="font-semibold">Status:</span>
+                {" "}
+                {selectedTeacher.status}
+              </div>
+
+            </div>
+
+
+
+            <button
+              onClick={()=>setSelectedTeacher(null)}
+              className="mt-6 w-full bg-blue-900 text-white py-3 rounded-xl font-semibold"
+            >
+              Close
+            </button>
+
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
 
