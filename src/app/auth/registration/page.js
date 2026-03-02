@@ -108,7 +108,7 @@ export default function RegistrationPage() {
           transition={{ duration: 0.4 }}
           className="p-10 md:p-12 flex flex-col justify-center"
         >
-          <h1 className="text-3xl font-semibold text-[#2b4bee] mb-8">
+          <h1 className="text-3xl font-semibold text-primary mb-8">
             Create Account
           </h1>
 
@@ -120,7 +120,7 @@ export default function RegistrationPage() {
                 type="button"
                 onClick={() => setRole(r)}
                 className={`px-4 py-1.5 text-xs rounded-full border transition ${role === r
-                  ? "bg-[#2b4bee] text-white border-[#2b4bee]"
+                  ? "bg-primary text-white border-primary"
                   : "text-gray-500 border-gray-300 hover:bg-gray-100"
                   }`}
               >
