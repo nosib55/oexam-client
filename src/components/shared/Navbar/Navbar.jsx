@@ -216,7 +216,7 @@ const Navbar = () => {
           )} */}
 
           <Link
-            href={'/auth/login'}
+            href={"/auth/login"}
             className="btn btn-primary rounded-2xl px-8 font-black text-white shadow-xl shadow-primary/20 border-none hover:translate-y-[-3px] hover:shadow-primary/40 active:scale-95 transition-all duration-500 uppercase tracking-tighter"
           >
             {/* {user ? 'Dashboard' : 'Login'} */}
