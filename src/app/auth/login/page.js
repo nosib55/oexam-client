@@ -23,7 +23,7 @@ export default function LoginPage() {
           transition={{ duration: 0.4 }}
           className="p-8 sm:p-10 md:p-12 flex flex-col justify-center order-2 md:order-1"
         >
-          <h1 className="text-2xl sm:text-3xl font-semibold text-[#2b4bee] mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-primary mb-6 sm:mb-8">
             Login
           </h1>
 
@@ -35,7 +35,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setRole(r)}
                 className={`px-3 sm:px-4 py-1.5 text-xs rounded-full border transition ${role === r
-                  ? "bg-[#2b4bee] text-white border-[#2b4bee]"
+                  ? "bg-primary text-white border-primary"
                   : "text-gray-500 border-gray-300 hover:bg-gray-100"
                   }`}
               >
@@ -65,7 +65,7 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <button className="w-full bg-[#2b4bee] text-white py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition">
+            <button className="w-full bg-primary text-white py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition">
               Continue as {role}
             </button>
           </form>
@@ -77,7 +77,7 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="flex flex-col justify-center items-center text-center
-                     bg-gradient-to-br from-[#2b4bee] to-[#1f36b8] text-white
+                     bg-primary text-white
                      p-8 sm:p-10 md:p-12
                      order-1 md:order-2"
         >

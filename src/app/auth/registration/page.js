@@ -75,8 +75,8 @@ export default function RegistrationPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
           className="flex flex-col justify-center items-center text-center
-                     bg-gradient-to-br from-[#2b4bee] to-[#1f36b8]
-                     text-white p-12"
+                     bg-primary
+                     text-secondary p-12"
         >
           <h2 className="text-4xl font-bold mb-4 text-yellow-300">
             Get Started
