@@ -176,12 +176,12 @@ export default function RegistrationPage() {
             {/* ===== PROFILE IMAGE BELOW FORM ===== */}
             <div className="flex flex-col items-center gap-3 mt-8">
               <label className="cursor-pointer">
-                <div className="w-24 h-24 rounded-full border-2 border-dashed border-[#2b4bee]
+                <div className="w-24 h-24 rounded-full border-2 border-dashed border-primary
                               flex items-center justify-center overflow-hidden bg-[#eef1ff]">
                   {preview ? (
                     <img src={preview} alt="preview" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xs text-[#2b4bee]">Upload Photo</span>
+                    <span className="text-xs text-primary">Upload Photo</span>
                   )}
                 </div>
                 <input
@@ -193,7 +193,7 @@ export default function RegistrationPage() {
               </label>
 
               {uploading && (
-                <p className="text-xs text-[#2b4bee]">Uploading image...</p>
+                <p className="text-xs text-primary">Uploading image...</p>
               )}
             </div>
 
@@ -202,7 +202,7 @@ export default function RegistrationPage() {
               <input
                 type="checkbox"
                 {...register("terms", { required: true })}
-                className="accent-[#2b4bee]"
+                className="accent-primary"
               />
               I accept the terms of the agreement
             </label>
@@ -210,7 +210,7 @@ export default function RegistrationPage() {
               <p className="text-red-500 text-xs">You must accept terms</p>
             )}
 
-            <button className="w-full bg-[#2b4bee] text-white py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition">
+            <button className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition">
               Sign Up
             </button>
           </form>
