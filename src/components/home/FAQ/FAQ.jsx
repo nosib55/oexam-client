@@ -6,7 +6,7 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: 'Is the O-Exam platform secure for my institution?',
+      question: 'Is the EXAMINERLY platform secure for my institution?',
       answer:
         'Absolutely! We use industry-standard end-to-end encryption and AI-powered proctoring to ensure exam transparency and maximum security for all data.',
     },

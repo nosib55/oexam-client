@@ -7,7 +7,7 @@ const Testimonials = () => {
       role: 'Dean, Oxford Academy',
       image: 'https://i.pravatar.cc/150?u=sarah',
       comment:
-        "The AI eye-tracking feature is a game-changer. We've seen a 40% reduction in academic dishonesty since switching to O-Exam.",
+        "The AI eye-tracking feature is a game-changer. We've seen a 40% reduction in academic dishonesty since switching to EXAMINERLY.",
       rating: 5,
     },
     {

@@ -79,7 +79,7 @@ const Commitment = () => {
               Empowering the Next <br /> Generation of Learners
             </h2>
             <p className="text-slate-400 text-lg font-medium leading-relaxed max-w-xl">
-              O-Exam was founded with a single mission: to provide educators
+              EXAMINERLY was founded with a single mission: to provide educators
               with a platform that is as reliable as it is powerful. We believe
               that technology should enable learning, not complicate it.
             </p>
