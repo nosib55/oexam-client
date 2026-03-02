@@ -51,7 +51,7 @@ const Navbar = () => {
                 </p>
               </div>
               <div className="space-y-1">
-                {navRoutes.map((item) => (
+                {navRoutes.map(item => (
                   <li key={item.name}>
                     <Link
                       href={item.href}
@@ -69,7 +69,7 @@ const Navbar = () => {
               </div>
               <div className="mt-4 p-4 bg-gradient-to-br from-primary/5 to-transparent rounded-[1.5rem] text-center">
                 <p className="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">
-                  O-Exam v2.0
+                  EXAMINERLY v2.0
                 </p>
               </div>
             </ul>
@@ -79,7 +79,7 @@ const Navbar = () => {
 
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal gap-2">
-            {navRoutes.map((item) => (
+            {navRoutes.map(item => (
               <li key={item.name}>
                 <Link
                   href={item.href}
@@ -216,7 +216,7 @@ const Navbar = () => {
           )} */}
 
           <Link
-            href={"/auth/login"}
+            href={'/auth/login'}
             className="btn btn-primary rounded-2xl px-8 font-black text-white shadow-xl shadow-primary/20 border-none hover:translate-y-[-3px] hover:shadow-primary/40 active:scale-95 transition-all duration-500 uppercase tracking-tighter"
           >
             {/* {user ? 'Dashboard' : 'Login'} */}

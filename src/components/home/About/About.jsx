@@ -61,9 +61,9 @@ const About = () => {
                 learners.
               </h2>
               <p className="text-lg text-base-content/70 font-medium leading-relaxed">
-                O-Exam isn&apos;t just an assessment tool; it&apos;s a bridge
-                between ambition and achievement. We&apos;ve built an ecosystem
-                where integrity meets innovation.
+                EXAMINERLY isn&apos;t just an assessment tool; it&apos;s a
+                bridge between ambition and achievement. We&apos;ve built an
+                ecosystem where integrity meets innovation.
               </p>
             </div>
 
