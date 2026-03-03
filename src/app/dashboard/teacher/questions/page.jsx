@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { 
+  FaPlus, 
+  FaEdit, 
+  FaTrash, 
+  FaSearch, 
+  FaFilter, 
+  FaBookOpen, 
+  FaCheckCircle, 
+  FaLayerGroup 
+} from "react-icons/fa";
 
 const questionsData = [
   { id: 1, title: "What is React?", subject: "ICT", type: "MCQ", difficulty: "Easy", status: "Published" },
@@ -40,184 +49,164 @@ export default function QuestionsPage() {
     (filters.status === "All" || q.status === filters.status)
   );
 
-  const total = questionsData.length;
-  const published = questionsData.filter(q => q.status === "Published").length;
-  const draft = questionsData.filter(q => q.status === "Draft").length;
+  const stats = [
+    { label: "Total Questions", value: questionsData.length, icon: <FaBookOpen />, color: "text-blue-600 bg-blue-50" },
+    { label: "Published", value: questionsData.filter(q => q.status === "Published").length, icon: <FaCheckCircle />, color: "text-emerald-600 bg-emerald-50" },
+    { label: "Drafts", value: questionsData.filter(q => q.status === "Draft").length, icon: <FaLayerGroup />, color: "text-amber-600 bg-amber-50" },
+  ];
 
   const resetFilters = () => {
-    setFilters({
-      title: "",
-      subject: "All",
-      type: "All",
-      difficulty: "All",
-      status: "All",
-    });
+    setFilters({ title: "", subject: "All", type: "All", difficulty: "All", status: "All" });
   };
 
   return (
-    <div className="p-6 bg-base-200 min-h-screen">
-
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Question Bank</h1>
-        <button className="btn btn-primary flex items-center gap-2">
-          <FaPlus /> Add Question
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <div className="card bg-base-100 shadow-md p-5">
-          <p className="text-sm text-gray-500">Total Questions</p>
-          <h2 className="text-3xl font-bold">{total}</h2>
-        </div>
-        <div className="card bg-base-100 shadow-md p-5">
-          <p className="text-sm text-gray-500">Published</p>
-          <h2 className="text-3xl font-bold text-green-500">{published}</h2>
-        </div>
-        <div className="card bg-base-100 shadow-md p-5">
-          <p className="text-sm text-gray-500">Draft</p>
-          <h2 className="text-3xl font-bold text-yellow-500">{draft}</h2>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-base-100 p-4 rounded-xl shadow-md mb-6">
-        <div className="grid md:grid-cols-5 gap-4">
-
-          <input
-            type="text"
-            placeholder="Search by title..."
-            className="input input-bordered w-full"
-            value={filters.title}
-            onChange={(e) =>
-              setFilters({ ...filters, title: e.target.value })
-            }
-          />
-
-          <select
-            className="select select-bordered w-full"
-            value={filters.subject}
-            onChange={(e) =>
-              setFilters({ ...filters, subject: e.target.value })
-            }
-          >
-            {subjects.map((s, i) => (
-              <option key={i} value={s}>{s}</option>
-            ))}
-          </select>
-
-          <select
-            className="select select-bordered w-full"
-            value={filters.type}
-            onChange={(e) =>
-              setFilters({ ...filters, type: e.target.value })
-            }
-          >
-            {types.map((t, i) => (
-              <option key={i} value={t}>{t}</option>
-            ))}
-          </select>
-
-          <select
-            className="select select-bordered w-full"
-            value={filters.difficulty}
-            onChange={(e) =>
-              setFilters({ ...filters, difficulty: e.target.value })
-            }
-          >
-            {difficulties.map((d, i) => (
-              <option key={i} value={d}>{d}</option>
-            ))}
-          </select>
-
-          <select
-            className="select select-bordered w-full"
-            value={filters.status}
-            onChange={(e) =>
-              setFilters({ ...filters, status: e.target.value })
-            }
-          >
-            {statuses.map((s, i) => (
-              <option key={i} value={s}>{s}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mt-4 text-right">
-          <button onClick={resetFilters} className="btn btn-outline btn-sm">
-            Reset Filters
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-10 p-4 lg:p-0">
+      
+      {/* ================= PREMIUM HEADER ================= */}
+      <div className="relative overflow-hidden p-8 md:p-10 rounded-[3rem] bg-white border border-slate-100 shadow-2xl transition-all hover:shadow-primary/10">
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary/10 blur-[100px] rounded-full"></div>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
+              Resource Management
+            </span>
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-800">
+              Question <span className="text-primary">Bank</span>
+            </h1>
+          </div>
+          <button className="bg-primary hover:bg-primary/90 text-white h-14 rounded-2xl px-8 font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-95 group">
+            <FaPlus className="transition-transform group-hover:rotate-90" />
+            <span>Add New Question</span>
           </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto bg-base-100 shadow-md rounded-lg">
-        <table className="table w-full">
-          <thead className="bg-base-300">
-            <tr>
-              <th>#</th>
-              <th>Title</th>
-              <th>Subject</th>
-              <th>Type</th>
-              <th>Difficulty</th>
-              <th>Status</th>
-              <th className="text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredQuestions.map((q, index) => (
-              <tr key={q.id} className="hover">
-                <td>{index + 1}</td>
-                <td className="font-medium">{q.title}</td>
-                <td>{q.subject}</td>
-                <td>
-                  <span className="badge badge-info">{q.type}</span>
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      q.difficulty === "Easy"
-                        ? "badge-success"
-                        : q.difficulty === "Medium"
-                        ? "badge-warning"
-                        : "badge-error"
-                    }`}
-                  >
-                    {q.difficulty}
-                  </span>
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      q.status === "Published"
-                        ? "badge-primary"
-                        : "badge-outline"
-                    }`}
-                  >
-                    {q.status}
-                  </span>
-                </td>
-                <td className="flex justify-center gap-2">
-                  <button className="btn btn-sm btn-outline btn-info">
-                    <FaEdit />
-                  </button>
-                  <button className="btn btn-sm btn-outline btn-error">
-                    <FaTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
+      {/* ================= STATS GRID ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((stat, i) => (
+          <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
+            <div className="flex justify-between items-start mb-4">
+              <div className={`p-4 rounded-2xl ${stat.color} group-hover:scale-110 transition-transform`}>
+                {stat.icon}
+              </div>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</span>
+            </div>
+            <h2 className="text-4xl font-black text-slate-800 tracking-tighter">{stat.value}</h2>
+          </div>
+        ))}
+      </div>
 
-            {filteredQuestions.length === 0 && (
-              <tr>
-                <td colSpan="7" className="text-center py-6 text-gray-500">
-                  No questions found
-                </td>
+      {/* ================= FILTERS SECTION ================= */}
+      <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm space-y-6">
+        <div className="flex items-center gap-3 mb-2">
+          <FaFilter className="text-primary" />
+          <h3 className="font-black text-slate-800 uppercase tracking-widest text-sm">Advanced Filters</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="relative lg:col-span-1">
+            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search title..."
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 text-sm font-medium transition-all"
+              value={filters.title}
+              onChange={(e) => setFilters({ ...filters, title: e.target.value })}
+            />
+          </div>
+
+          {[
+            { label: "Subject", key: "subject", options: subjects },
+            { label: "Type", key: "type", options: types },
+            { label: "Difficulty", key: "difficulty", options: difficulties },
+            { label: "Status", key: "status", options: statuses },
+          ].map((filter) => (
+            <select
+              key={filter.key}
+              className="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 text-sm font-bold text-slate-600 cursor-pointer appearance-none transition-all"
+              value={filters[filter.key]}
+              onChange={(e) => setFilters({ ...filters, [filter.key]: e.target.value })}
+            >
+              {filter.options.map((opt, i) => (
+                <option key={i} value={opt}>{opt === "All" ? `All ${filter.label}s` : opt}</option>
+              ))}
+            </select>
+          ))}
+        </div>
+
+        <div className="flex justify-end">
+          <button onClick={resetFilters} className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors">
+            Clear all filters
+          </button>
+        </div>
+      </div>
+
+      {/* ================= DATA TABLE ================= */}
+      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/50">
+                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">#</th>
+                <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Question Details</th>
+                <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadata</th>
+                <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Difficulty</th>
+                <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {filteredQuestions.map((q, index) => (
+                <tr key={q.id} className="group hover:bg-slate-50/50 transition-colors">
+                  <td className="px-8 py-6 text-sm font-black text-slate-300">{(index + 1).toString().padStart(2, '0')}</td>
+                  <td className="px-6 py-6">
+                    <p className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors leading-tight">{q.title}</p>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{q.subject}</span>
+                  </td>
+                  <td className="px-6 py-6">
+                    <span className="px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest">
+                      {q.type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-6">
+                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                      q.difficulty === "Easy" ? "bg-emerald-50 text-emerald-600" :
+                      q.difficulty === "Medium" ? "bg-amber-50 text-amber-600" : "bg-rose-50 text-rose-600"
+                    }`}>
+                      {q.difficulty}
+                    </span>
+                  </td>
+                  <td className="px-6 py-6">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full ${q.status === "Published" ? "bg-primary animate-pulse" : "bg-slate-300"}`}></span>
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${q.status === "Published" ? "text-slate-700" : "text-slate-400"}`}>
+                        {q.status}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="flex justify-center gap-2">
+                      <button className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary hover:text-white transition-all">
+                        <FaEdit size={14} />
+                      </button>
+                      <button className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all">
+                        <FaTrash size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredQuestions.length === 0 && (
+          <div className="py-20 text-center space-y-3">
+            <div className="text-4xl">🔍</div>
+            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No matching questions found</p>
+            <button onClick={resetFilters} className="text-primary text-xs font-black underline">Reset Filters</button>
+          </div>
+        )}
       </div>
 
     </div>
