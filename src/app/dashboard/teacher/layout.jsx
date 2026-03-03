@@ -92,17 +92,17 @@ export default function TeacherLayout({ children }) {
         </nav>
 
         {/* User Profile Summary (Bottom) */}
-        <div className="p-5 border-t border-slate-100 dark:border-slate-800/50 mx-4 mb-4 bg-slate-50 dark:bg-white/5 rounded-3xl transition-colors">
+        <div className="p-5 border mx-4 mb-4 bg-slate-50 rounded-3xl transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-bold shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-primary text-secondary flex items-center justify-center font-bold shadow-md">
               TQ
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-slate-800 dark:text-white truncate">
-                Team-oexam
+              <p className="text-xs font-bold text-slate-800 truncate">
+                Team-Examinerly
               </p>
               <p className="text-[10px] text-slate-500 truncate italic">
-                oexam@edu.com
+                examinerly@edu.com
               </p>
             </div>
           </div>
