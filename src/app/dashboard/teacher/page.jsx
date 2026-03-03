@@ -64,13 +64,28 @@ export default function TeacherPage() {
               Teacher <span className="text-primary">Console</span>
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard/teacher/exams">
-              <button className="bg-primary hover:bg-primary/90 text-white h-14 rounded-2xl px-8 font-bold shadow-xl shadow-primary/20 transition-all flex items-center gap-2 active:scale-95">
-                <LuPlus size={20} /> Create New Exam
+          <div className="flex items-center gap-3 md:gap-4">
+            {/* Create New Exam Button */}
+            <Link
+              href="/dashboard/teacher/exams"
+              className="flex-1 sm:flex-none"
+            >
+              <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white h-12 md:h-14 rounded-xl md:rounded-2xl px-4 md:px-8 font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-95 group">
+                <LuPlus
+                  size={22}
+                  className="shrink-0 transition-transform group-hover:rotate-90"
+                />
+                <span className="text-sm md:text-base whitespace-nowrap hidden md:block">
+                  Create New Exam
+                </span>
               </button>
             </Link>
-            <button className="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 text-slate-400 border border-white/10 hover:bg-red-500/20 hover:text-red-400 transition-all">
+
+            {/* Logout Button */}
+            <button
+              title="Logout"
+              className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl md:rounded-2xl bg-white/5 text-slate-400 border border-white/10 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-all active:scale-95 shrink-0"
+            >
               <LuLogOut size={22} />
             </button>
           </div>
@@ -180,7 +195,7 @@ export default function TeacherPage() {
         {/* Right Column: Leaderboard & Quick Action */}
         <div className="lg:col-span-4 space-y-8">
           {/* Real-time Leaderboard */}
-          <div className="bg-slate-900 text-white rounded-[3rem] p-8 shadow-2xl relative overflow-hidden">
+          <div className="rounded-[3rem] p-8 shadow-2xl relative overflow-hidden border">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full"></div>
             <div className="flex items-center gap-3 mb-8">
               <LuTrophy className="text-amber-400" size={24} />
@@ -212,7 +227,7 @@ export default function TeacherPage() {
                   </span>
                 </div>
               ))}
-              <button className="w-full py-4 mt-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary transition-all">
+              <button className="w-full py-4 mt-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] bg-primary transition-all">
                 View Full Results
               </button>
             </div>
