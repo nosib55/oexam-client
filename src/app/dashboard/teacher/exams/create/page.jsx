@@ -3,7 +3,7 @@ import { LuSettings2 } from 'react-icons/lu';
 
 const NewExamSetup = () => {
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-8 my-24">
       <div className="text-center space-y-2">
         <h2 className="text-3xl font-black text-slate-800">Create New Exam</h2>
         <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">
