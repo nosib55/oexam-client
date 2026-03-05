@@ -156,7 +156,7 @@ export default function ResultsPage() {
               Results & <span className="text-primary">Grading</span>
             </h1>
           </div>
-          <button className="bg-slate-900 hover:bg-slate-800 text-white h-14 rounded-2xl px-8 font-bold shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95 group">
+          <button className="bg-primary text-secondary h-14 rounded-2xl px-8 font-bold shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95 group">
             <FaDownload className="group-hover:translate-y-0.5 transition-transform" />
             <span>Export Report</span>
           </button>
