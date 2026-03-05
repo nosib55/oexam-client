@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import {
   FaSearch,
@@ -9,6 +10,7 @@ import {
   FaTimesCircle,
   FaUserGraduate,
   FaFilter,
+  FaPenNib,
 } from 'react-icons/fa';
 
 const resultsData = [
@@ -235,6 +237,9 @@ export default function ResultsPage() {
                 <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   Result
                 </th>
+                <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -290,6 +295,18 @@ export default function ResultsPage() {
                       ></span>
                       {r.status}
                     </span>
+                  </td>
+                  {/* Table Body */}
+                  <td className="px-8 py-6">
+                    <div className="flex justify-center">
+                      <Link
+                        href={`/dashboard/teacher/script-check`}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                      >
+                        <FaPenNib size={12} />
+                        <span>Review Script</span>
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
