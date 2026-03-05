@@ -73,8 +73,8 @@ const AddNewStudent = () => {
             </div>
           </div>
 
-          <div className="bg-slate-900 p-8 rounded-[3rem] text-white relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/20 to-transparent"></div>
+          <div className="p-8 rounded-[3rem] shadow relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full"></div>
             <div className="relative z-10 space-y-4">
               <h4 className="text-sm font-black uppercase tracking-widest text-primary">
                 Quick Info
