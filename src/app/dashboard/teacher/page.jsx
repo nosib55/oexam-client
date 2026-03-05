@@ -121,9 +121,12 @@ export default function TeacherPage() {
             <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
             Active Exam Control
           </h3>
-          <button className="text-[10px] md:text-xs font-bold text-primary hover:underline uppercase tracking-widest">
+          <Link
+            href={'/dashboard/teacher/exams/examlist'}
+            className="text-[10px] md:text-xs font-bold text-primary hover:underline uppercase tracking-widest"
+          >
             View All Exams
-          </button>
+          </Link>
         </div>
 
         <div className="p-6 md:p-8 space-y-6">
