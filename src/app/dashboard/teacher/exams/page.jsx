@@ -119,9 +119,9 @@ export default function ExamsPage() {
           </div>
           <Link
             href={'/dashboard/teacher/exams/create'}
-            className="bg-slate-900 hover:bg-primary text-white h-16 rounded-[2rem] px-10 font-black shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95 group"
+            className="bg-primary text-secondary h-16 rounded-2xl px-5 font-black shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95 group"
           >
-            <FaPlus className="transition-transform group-hover:rotate-90 text-primary" />
+            <FaPlus className="transition-transform group-hover:rotate-90" />
             <span className="uppercase text-xs tracking-widest">
               Create New Exam
             </span>
