@@ -63,7 +63,6 @@ const LoadingScreen = () => {
       <div
         className="absolute inset-0 pointer-events-none z-10 opacity-60"
         style={{
-          // আপনার প্রাইমারি কালার #004aad কে rgba(0, 74, 173) এ কনভার্ট করে সাবটল গ্রিড তৈরি করেছি
           backgroundImage: `repeating-linear-gradient(0deg, rgba(0, 74, 173, 0.05) 0px, rgba(0, 74, 173, 0.05) 1px, transparent 1px, transparent 4px)`,
         }}
       ></div>
@@ -73,7 +72,7 @@ const LoadingScreen = () => {
         <h1
           className="text-5xl md:text-7xl font-black tracking-[0.2em] mb-8 min-h-[1.2em] transition-all"
           style={{
-            color: '#004aad', // সরাসরি প্রাইমারি কালার
+            color: '#004aad',
             textShadow:
               '0 0 15px rgba(0, 74, 173, 0.5), 0 0 30px rgba(0, 74, 173, 0.15)',
           }}
@@ -99,7 +98,7 @@ const LoadingScreen = () => {
               className="w-2.5 h-2.5 rounded-full animate-terminal-bounce"
               style={{
                 backgroundColor: '#004aad',
-                boxShadow: '0 0 10px rgba(0, 74, 173, 0.7)', // কালার সিনকড শ্যাডো
+                boxShadow: '0 0 10px rgba(0, 74, 173, 0.7)',
                 animationDelay: `${i * 0.15}s`,
               }}
             ></div>
