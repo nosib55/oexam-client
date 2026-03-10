@@ -1,13 +1,85 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from "react-icons/fi";
 import { motion } from "framer-motion";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [role, setRole] = useState("student");
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // if user already logged in, send them straight to their dashboard
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) {
+      try {
+        const u = JSON.parse(stored);
+        if (u?.role) {
+          router.replace(`/dashboard/${u.role}`);
+        }
+      } catch {}
+    }
+  }, [router]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!email || !password) {
+      setError("Please fill in both email and password");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // ensure cookies (Set-Cookie) are saved
+        body: JSON.stringify({ email, password, role }),
+      });
+
+      const data = await res.json();
+      console.log("login response", data);
+      if (!res.ok) {
+        setError(data.message || "Login failed");
+        return;
+      }
+
+      console.log("cookies after response:", document.cookie);
+
+      // save token (simple example - adjust as needed)
+      // persist token/user both in localStorage for client-side
+      // convenience and as a cookie for the server middleware.
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      document.cookie = `token=${data.token}; path=/; max-age=604800`;
+
+      console.log("cookies after setting:", document.cookie);
+
+      // redirect based on role
+      console.log("redirecting user", data.user.role);
+      try {
+        // use full page reload to ensure cookie is sent
+        window.location.href = `/dashboard/${data.user.role}`;
+      } catch (routeErr) {
+        console.error("redirect error", routeErr);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Server error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#ece9f6] p-4">
@@ -47,14 +119,26 @@ export default function LoginPage() {
           {/* FORM */}
           <form
             className="space-y-4 sm:space-y-5"
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert(`Login as ${role}`);
-            }}
+            onSubmit={handleSubmit}
           >
-            <Input icon={<FiMail />} placeholder="E-mail" type="email" />
+            {error && (
+              <p className="text-red-500 text-sm text-center">{error}</p>
+            )}
 
-            <PasswordInput show={show} toggle={() => setShow(!show)} />
+            <Input
+              icon={<FiMail />}
+              placeholder="E-mail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <PasswordInput
+              show={show}
+              toggle={() => setShow(!show)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
             <div className="text-right">
               <Link
@@ -65,8 +149,11 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <button className="w-full bg-primary text-white py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition">
-              Continue as {role}
+            <button
+              disabled={loading}
+              className="w-full bg-primary text-white py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition disabled:opacity-50"
+            >
+              {loading ? "Logging in..." : `Continue as ${role}`}
             </button>
           </form>
         </motion.div>
@@ -120,26 +207,30 @@ export default function LoginPage() {
 
 /* ---------- INPUTS ---------- */
 
-function Input({ icon, type = "text", placeholder }) {
+function Input({ icon, type = "text", placeholder, value, onChange }) {
   return (
     <div className="flex items-center border-b border-gray-300 py-2">
       <span className="text-gray-400 mr-3">{icon}</span>
       <input
         type={type}
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
         className="w-full outline-none text-sm placeholder-gray-400"
       />
     </div>
   );
 }
 
-function PasswordInput({ show, toggle }) {
+function PasswordInput({ show, toggle, value, onChange }) {
   return (
     <div className="flex items-center border-b border-gray-300 py-2">
       <FiLock className="text-gray-400 mr-3" />
       <input
         type={show ? "text" : "password"}
         placeholder="Password"
+        value={value}
+        onChange={onChange}
         className="w-full outline-none text-sm placeholder-gray-400"
       />
       <button type="button" onClick={toggle} className="text-gray-400">
