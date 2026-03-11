@@ -16,7 +16,7 @@ export async function POST(req) {
     const body = await req.json();
     console.log("Registration request body:", body);
 
-    const { name, email, password, role, institution } = body;
+    const { name, email, password, role, institution, location } = body;
 
     if (!name || !email || !password || !role) {
       return NextResponse.json(
@@ -60,6 +60,7 @@ export async function POST(req) {
         password: hashedPassword,
         role,
         institution: role !== "admin" ? institution : undefined,
+        location,
         isVerified: false,
         otp,
         otpExpires,
