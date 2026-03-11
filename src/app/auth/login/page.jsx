@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
 import { motion } from "framer-motion";
+import { auth, googleProvider } from "@/lib/firebase";
+import { signInWithPopup } from "firebase/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,7 +27,7 @@ export default function LoginPage() {
         if (u?.role) {
           router.replace(`/dashboard/${u.role}`);
         }
-      } catch {}
+      } catch { }
     }
   }, [router]);
 
@@ -49,7 +52,16 @@ export default function LoginPage() {
 
       const data = await res.json();
       console.log("login response", data);
+
       if (!res.ok) {
+        if (data.unverified) {
+          setError(data.message);
+          // Redirect to verify page after small delay
+          setTimeout(() => {
+            router.push(`/auth/verify?email=${encodeURIComponent(data.email)}`);
+          }, 2000);
+          return;
+        }
         setError(data.message || "Login failed");
         return;
       }
@@ -81,6 +93,43 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+
+      const res = await fetch("/api/auth/social-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.displayName,
+          role: role,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message || "Social login failed");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      document.cookie = `token=${data.token}; path=/; max-age=604800`;
+
+      window.location.href = `/dashboard/${data.user.role}`;
+    } catch (err) {
+      console.error(err);
+      setError("Social login cancelled or failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#ece9f6] p-4">
 
@@ -101,7 +150,7 @@ export default function LoginPage() {
 
           {/* Role switch */}
           <div className="flex gap-2 sm:gap-3 mb-5 sm:mb-6">
-            {["student", "teacher"].map((r) => (
+            {["student", "teacher", "admin"].map((r) => (
               <button
                 key={r}
                 type="button"
@@ -154,6 +203,23 @@ export default function LoginPage() {
               className="w-full bg-primary text-white py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-[#1f36b8] transition disabled:opacity-50"
             >
               {loading ? "Logging in..." : `Continue as ${role}`}
+            </button>
+
+            {/* Social Divider */}
+            <div className="flex items-center gap-3 my-4">
+              <div className="flex-1 h-[1px] bg-gray-200" />
+              <span className="text-xs text-gray-400 font-medium">Or continue with</span>
+              <div className="flex-1 h-[1px] bg-gray-200" />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50"
+            >
+              <FcGoogle className="text-xl" />
+              <span>Google Login</span>
             </button>
           </form>
         </motion.div>

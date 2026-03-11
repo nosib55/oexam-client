@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
+import { sendOTP } from "@/lib/email";
 
 export async function POST(req) {
   try {
@@ -34,25 +35,55 @@ export async function POST(req) {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return NextResponse.json(
-        { message: "User already exists" },
-        { status: 400 }
-      );
+      if (existingUser.isVerified) {
+        return NextResponse.json(
+          { message: "User already exists and is verified. Please login." },
+          { status: 400 }
+        );
+      }
+      // If user exists but not verified, we'll update them with a new OTP below
+      console.log(`User ${email} exists but is unverified. Updating OTP.`);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      institution: role !== "admin" ? institution : undefined,
-    });
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Update if exists (already check isVerified above), or Create if new
+    const user = await User.findOneAndUpdate(
+      { email },
+      {
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        institution: role !== "admin" ? institution : undefined,
+        isVerified: false,
+        otp,
+        otpExpires,
+      },
+      { upsert: true, returnDocument: 'after' }
+    );
+
+    // Try sending real email (General SMTP setup)
+    try {
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        await sendOTP(email, otp);
+      }
+    } catch (e) {
+      console.error("Email delivery failed:", e);
+    }
+
+    // Always log to terminal for local backup
+    console.log(`\n================================`);
+    console.log(`🔐 OTP for ${email}: ${otp}`);
+    console.log(`================================\n`);
 
     return NextResponse.json({
-      message: "User registered successfully",
-      user,
+      message: "Registration successful. Please check your email for the OTP.",
+      user: { id: user._id, email: user.email },
     });
   } catch (error) {
     console.error("Registration error:", error);

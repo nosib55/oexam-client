@@ -33,6 +33,19 @@ const UserSchema = new mongoose.Schema(
         return this.role !== "admin";
       },
     },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    otp: {
+      type: String,
+    },
+
+    otpExpires: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
