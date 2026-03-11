@@ -1,34 +1,141 @@
-"use client";
-import Link from "next/link";
-import Logo from "../Logo/Logo";
-// import Logo from "../Logo/Logo";
+'use client';
+import Link from 'next/link';
+import Logo from '../Logo/Logo';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
-const Navbar = () => {
-  // const user = {
-  //   name: "Habiba Sultana",
-  //   role: "student",
-  //   image: "https://i.ibb.co.com/MxSXSPf3/kids.jpg",
-  // };
+const Navbar = ({ initialUser }) => {
+  const [user, setUser] = useState(null);
+  const [mounted, setMounted] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        // Sync isVerified state with stored user data on mount
+        setIsVerified(parsedUser.isVerified || false);
+      } catch (error) {
+        console.error('User parsing error:', error);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    setUser(null);
+    window.location.href = '/';
+  };
+
+  const handleVerifyClick = async () => {
+    // 1. Ask for email input
+    const { value: email } = await Swal.fire({
+      title: 'Verify Email',
+      input: 'email',
+      inputLabel: 'We will send a 6-digit code',
+      confirmButtonColor: '#3B82F6',
+      cancelButtonColor: '#EF4444',
+      showCancelButton: true,
+      confirmButtonText: 'Send Code',
+    });
+
+    if (email) {
+      Swal.fire({
+        title: 'Sending...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      try {
+        const res = await fetch(`/api/email-verify?email=${email}`);
+        const data = await res.json();
+
+        if (res.ok) {
+          // 2. Prompt for the code received in email
+          const { value: enteredCode } = await Swal.fire({
+            title: 'Enter Code',
+            text: `Check your email: ${email}`,
+            input: 'text',
+            inputPlaceholder: '123456',
+            confirmButtonColor: '#10B981',
+            confirmButtonText: 'Verify Now',
+            showCancelButton: true,
+            cancelButtonColor: '#6B7280',
+          });
+
+          if (enteredCode === data.code.toString()) {
+            // 3. Update status in MongoDB
+            const dbUpdate = await fetch('/api/user/verify-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: email, status: true }),
+            });
+
+            if (dbUpdate.ok) {
+              // --- CRITICAL: Sync UI, LocalState, and LocalStorage ---
+              setIsVerified(true);
+
+              const storedUser = localStorage.getItem('user');
+              if (storedUser) {
+                const userData = JSON.parse(storedUser);
+                userData.isVerified = true; // Update property
+                localStorage.setItem('user', JSON.stringify(userData)); // Save back to storage
+                setUser(userData); // Update local user state
+              }
+
+              Swal.fire({
+                title: 'Verified!',
+                text: 'Your email is verified permanently.',
+                icon: 'success',
+                confirmButtonColor: '#3B82F6',
+              });
+            } else {
+              Swal.fire(
+                'Error',
+                'Code matched but failed to update database.',
+                'error',
+              );
+            }
+          } else if (enteredCode) {
+            Swal.fire('Error', 'The code you entered is incorrect.', 'error');
+          }
+        } else {
+          Swal.fire('Error', data.error || 'Failed to send email.', 'error');
+        }
+      } catch (err) {
+        Swal.fire('Error', 'Something went wrong. Please try again.', 'error');
+      }
+    }
+  };
+
+  if (!mounted) return null;
 
   const navRoutes = [
-    { name: "Home", href: "/", icon: "🏠" },
-    { name: "Pricing", href: "#pricing", icon: "💎" },
-    { name: "How it works", href: "#how-it-works", icon: "⚙️" },
-    { name: "About", href: "#about", icon: "✨" },
+    { name: 'Home', href: '/', icon: '🏠' },
+    { name: 'Pricing', href: '#pricing', icon: '💎' },
+    { name: 'How it works', href: '#how-it-works', icon: '⚙️' },
+    { name: 'About', href: '#about', icon: '✨' },
   ];
 
   return (
     <div className="flex bg-base-100/70 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] w-full justify-center sticky top-0 z-50 pt-2">
-      <div className="navbar mx-auto w-full max-w-[1440px] px-4 md:px-10 lg:px-20 min-h-[70px]">
+      <div className="navbar h-20 mx-auto w-full max-w-[1440px] md:px-10 lg:px-20 min-h-[70px]">
+        {/* Navbar Start: Logo & Mobile Menu */}
         <div className="navbar-start">
           <div className="dropdown">
             <label
               tabIndex={0}
-              className="btn btn-ghost lg:hidden p-2 mr-3 hover:bg-primary/10 rounded-xl transition-all duration-300"
+              className="btn btn-ghost lg:hidden hover:bg-primary/10 rounded-xl transition-all duration-300"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-primary"
+                className="h-5 w-5 text-primary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -67,16 +174,12 @@ const Navbar = () => {
                   </li>
                 ))}
               </div>
-              <div className="mt-4 p-4 bg-gradient-to-br from-primary/5 to-transparent rounded-[1.5rem] text-center">
-                <p className="text-[10px] font-black opacity-40 uppercase tracking-[0.2em]">
-                  EXAMINERLY v2.0
-                </p>
-              </div>
             </ul>
           </div>
           <Logo />
         </div>
 
+        {/* Navbar Center: Desktop Menu */}
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal gap-2">
             {navRoutes.map(item => (
@@ -93,44 +196,71 @@ const Navbar = () => {
           </ul>
         </div>
 
+        {/* Navbar End: Notifications & User Profile */}
         <div className="navbar-end gap-3">
-          {/* Notification */}
-          <button className="btn btn-ghost btn-circle relative group hover:bg-primary/10 transition-all duration-500">
-            <div className="indicator">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7 text-base-content/70 group-hover:text-primary group-hover:rotate-[15deg] transition-all duration-300"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.8"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />
-              </svg>
-              <span className="indicator-item flex h-4 w-4">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-primary text-[10px] font-black text-white border-2 border-base-100">
-                  1
-                </span>
-              </span>
-            </div>
-          </button>
-
-          {/* {user && (
-            <div className="flex items-center gap-3 ml-2">
-              <div className="hidden xl:flex flex-col items-end leading-none">
-                <p className="text-sm font-black text-base-content">
-                  {user.name}
-                </p>
-                <span className="text-[9px] font-black uppercase text-primary tracking-widest bg-primary/10 px-2 py-0.5 rounded-md mt-1 italic">
-                  {user.role}
+          {user && (
+            <button className="btn btn-ghost btn-circle relative group hover:bg-primary/10 transition-all duration-500">
+              <div className="indicator">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-7 w-7 text-base-content/70 group-hover:text-primary group-hover:rotate-[15deg] transition-all duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
+                </svg>
+                <span className="indicator-item flex h-4 w-4">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-primary text-[10px] font-black text-white border-2 border-base-100">
+                    1
+                  </span>
                 </span>
               </div>
+            </button>
+          )}
+          {user && (
+            <div className="flex items-center gap-3 ml-2">
+              {/* Desktop User Info */}
+              <div className="hidden xl:flex flex-col items-end gap-0.5">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`relative flex h-2 w-2 rounded-full ${isVerified ? 'bg-blue-500' : 'bg-red-500 animate-pulse'}`}
+                  >
+                    {isVerified && (
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    )}
+                  </span>
+                  <p className="text-sm font-black text-base-content tracking-tight">
+                    {user.name}
+                  </p>
+                </div>
+                <div className="flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 shadow-sm">
+                  <span className="text-[8px] font-black uppercase text-primary tracking-widest italic">
+                    {user.role}
+                  </span>
+                  <div className="mx-1.5 h-2 w-[1px] bg-primary/20"></div>
+                  {isVerified ? (
+                    <span className="text-[8px] font-bold uppercase text-blue-600">
+                      Verified
+                    </span>
+                  ) : (
+                    <button
+                      onClick={handleVerifyClick}
+                      className="text-[8px] font-bold uppercase text-red-500 hover:text-red-700 transition-all flex items-center gap-1 border-none bg-transparent p-0"
+                    >
+                      Verify Email
+                    </button>
+                  )}
+                </div>
+              </div>
 
+              {/* User Dropdown Profile */}
               <div className="dropdown dropdown-end">
                 <label
                   tabIndex={0}
@@ -138,7 +268,7 @@ const Navbar = () => {
                 >
                   <div className="w-9 rounded-full relative overflow-hidden">
                     <Image
-                      src={user.image}
+                      src={user?.image || 'https://ibb.co.com/WW2RJLhF'}
                       alt="User"
                       width={40}
                       height={40}
@@ -158,41 +288,85 @@ const Navbar = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <p className="font-black text-xl text-base-content tracking-tight">
-                      {user.name}
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="font-black text-xl text-base-content tracking-tight">
+                        {user.name}
+                      </p>
+                      {isVerified && (
+                        <span className="text-blue-500">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.491 4.491 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[10px] font-black uppercase px-3 py-1 bg-primary text-white rounded-full tracking-widest mt-2 shadow-lg shadow-primary/30">
                       {user.role}
                     </span>
+                    {!isVerified && (
+                      <button
+                        onClick={handleVerifyClick}
+                        className="mt-3 text-[10px] font-bold uppercase text-red-500 hover:text-red-600 underline underline-offset-2"
+                      >
+                        Verify Account
+                      </button>
+                    )}
                   </div>
-
                   <div className="px-2 space-y-1">
+                    {/* Dashboard Link - Fast access to workspace */}
+                    <li>
+                      <Link
+                        href="/dashboard"
+                        className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 transition-all group hover:border-none outline-none"
+                      >
+                        <span className="p-2 bg-base-200 rounded-lg group-hover:bg-primary/20">
+                          📊
+                        </span>
+                        <span className="font-bold">Dashboard</span>
+                      </Link>
+                    </li>
+
+                    {/* Profile Preview */}
                     <li>
                       <Link
                         href="/profile"
-                        className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 hover:text-primary transition-all group border-none !outline-none"
+                        className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 transition-all group hover:border-none outline-none"
                       >
                         <span className="p-2 bg-base-200 rounded-lg group-hover:bg-primary/20">
                           👤
                         </span>
-                        <span className="font-bold">My Profile</span>
+                        <span className="font-bold">Public Profile</span>
                       </Link>
                     </li>
+
+                    {/* Settings (Optional if dashboard has it, keep it for quick access) */}
                     <li>
                       <Link
                         href="/profile/settings"
-                        className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 hover:text-primary transition-all group border-none !outline-none"
+                        className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 transition-all group  hover:border-none outline-none"
                       >
                         <span className="p-2 bg-base-200 rounded-lg group-hover:bg-primary/20">
                           ⚙️
                         </span>
-                        <span className="font-bold">Account Settings</span>
+                        <span className="font-bold">Quick Settings</span>
                       </Link>
                     </li>
                   </div>
                   <div className="divider px-4 my-2 opacity-30"></div>
                   <li className="px-2 pb-2">
-                    <button className="flex items-center justify-center gap-2 bg-error/10 hover:bg-error text-error hover:text-white transition-all duration-500 py-3.5 rounded-[1.5rem] font-black w-full border-none shadow-sm">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center justify-center gap-2 bg-error/10 hover:bg-error text-error hover:text-white transition-all duration-500 py-3.5 rounded-[1.5rem] font-black w-full border-none shadow-sm"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -213,14 +387,13 @@ const Navbar = () => {
                 </ul>
               </div>
             </div>
-          )} */}
+          )}
 
           <Link
             href={'/auth/login'}
-            className="btn btn-primary rounded-2xl px-8 font-black text-white shadow-xl shadow-primary/20 border-none hover:translate-y-[-3px] hover:shadow-primary/40 active:scale-95 transition-all duration-500 uppercase tracking-tighter"
+            className="bg-primary rounded-2xl px-4 md:px-8 py-4 text-[10px] md:text-base font-black text-white shadow-xl shadow-primary/20 border-none hover:translate-y-[-3px] hover:shadow-primary/40 active:scale-95 transition-all duration-500 uppercase tracking-tighter"
           >
-            {/* {user ? 'Dashboard' : 'Login'} */}
-            Login
+            {user ? 'Dashboard' : 'Login'}
           </Link>
         </div>
       </div>
