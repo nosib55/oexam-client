@@ -14,9 +14,10 @@ export async function POST(req) {
     await User.syncIndexes();
 
     const body = await req.json();
-    console.log("Registration request body:", body);
+    console.log("Registration request body RECEIVED:", JSON.stringify(body, null, 2));
 
-    const { name, email, password, role, institution, location } = body;
+    const { name, email, password, role, institution, userClass, location } = body;
+    console.log("Processing registration for:", email, "with userClass:", userClass);
 
     if (!name || !email || !password || !role) {
       return NextResponse.json(
@@ -28,6 +29,13 @@ export async function POST(req) {
     if (role !== "admin" && !institution) {
       return NextResponse.json(
         { message: "Institution is required for non-admin users" },
+        { status: 400 }
+      );
+    }
+
+    if (role === "student" && !userClass) {
+      return NextResponse.json(
+        { message: "Class is required for students" },
         { status: 400 }
       );
     }
@@ -60,6 +68,7 @@ export async function POST(req) {
         password: hashedPassword,
         role,
         institution: role !== "admin" ? institution : undefined,
+        userClass: role === "student" ? userClass : undefined,
         location,
         isVerified: false,
         otp,

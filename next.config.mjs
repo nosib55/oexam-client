@@ -5,12 +5,16 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ui-avatars.com',
-        pathname: '/api/**',
+        hostname: 'i.ibb.co',
       },
       {
         protocol: 'https',
-        hostname: 'i.ibb.co.com',
+        hostname: 'i.pravatar.cc',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        pathname: '/api/**',
       },
     ],
   },

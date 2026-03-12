@@ -34,6 +34,14 @@ const UserSchema = new mongoose.Schema(
       },
     },
 
+    userClass: {
+      type: String,
+    },
+
+    image: {
+      type: String,
+    },
+
     isVerified: {
       type: Boolean,
       default: false,
@@ -56,4 +64,9 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.models.User || mongoose.model("User", UserSchema);
+if (mongoose.models.User) {
+  mongoose.deleteModel("User");
+}
+
+const User = mongoose.model("User", UserSchema);
+export default User;

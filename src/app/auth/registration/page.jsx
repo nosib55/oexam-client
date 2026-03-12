@@ -44,7 +44,7 @@ export default function RegisterPage() {
                               role: role,
                               institution: data.institution,
                               location: data.location,
-                              class: data.class || null
+                              userClass: data.class || null
                         })
                   });
 

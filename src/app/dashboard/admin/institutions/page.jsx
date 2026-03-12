@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LuSchool,
   LuEye,
@@ -10,37 +10,18 @@ import {
 
 export default function InstitutionsPage() {
 
+  const [institutions, setInstitutions] = useState([]);
   const [selectedInstitution, setSelectedInstitution] = useState(null);
 
-  const institutions = [
-    {
-      id: 1,
-      name: "Ideal School",
-      location: "Dhaka",
-      teachers: 6,
-      students: 80,
-      address: "Dhanmondi, Dhaka",
-      phone: "01700000001"
-    },
-    {
-      id: 2,
-      name: "Sunrise School",
-      location: "Narayanganj",
-      teachers: 4,
-      students: 60,
-      address: "Fatullah, Narayanganj",
-      phone: "01700000002"
-    },
-    {
-      id: 3,
-      name: "Green Field School",
-      location: "Gazipur",
-      teachers: 3,
-      students: 40,
-      address: "Tongi, Gazipur",
-      phone: "01700000003"
-    }
-  ];
+  useEffect(() => {
+    fetchInstitutions();
+  }, []);
+
+  const fetchInstitutions = async () => {
+    const res = await fetch("/api/admin/institutions");
+    const data = await res.json();
+    setInstitutions(data);
+  };
 
 
   return (
@@ -117,7 +98,7 @@ export default function InstitutionsPage() {
               {institutions.map((school) => (
 
                 <tr
-                  key={school.id}
+                  key={school.name}
                   className="border-b hover:bg-gray-50 transition"
                 >
 
@@ -147,17 +128,17 @@ export default function InstitutionsPage() {
                     {/* View */}
 
                     <button
-                      onClick={()=>setSelectedInstitution(school)}
+                      onClick={() => setSelectedInstitution(school)}
                       className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
                     >
-                      <LuEye size={18}/>
+                      <LuEye size={18} />
                     </button>
 
 
                     {/* Delete */}
 
                     <button className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
-                      <LuTrash2 size={18}/>
+                      <LuTrash2 size={18} />
                     </button>
 
 
@@ -196,9 +177,9 @@ export default function InstitutionsPage() {
               </h2>
 
               <button
-                onClick={()=>setSelectedInstitution(null)}
+                onClick={() => setSelectedInstitution(null)}
               >
-                <LuX size={22}/>
+                <LuX size={22} />
               </button>
 
             </div>
@@ -267,7 +248,7 @@ export default function InstitutionsPage() {
 
 
             <button
-              onClick={()=>setSelectedInstitution(null)}
+              onClick={() => setSelectedInstitution(null)}
               className="mt-6 w-full bg-blue-900 text-white py-3 rounded-xl font-semibold"
             >
               Close

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LuSearch,
   LuEye,
@@ -12,40 +12,18 @@ import {
 export default function TeacherPage() {
 
   const [search, setSearch] = useState("");
+  const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
 
-  const teachers = [
-    {
-      id: 1,
-      name: "Habiba Akter",
-      email: "habiba@gmail.com",
-      institution: "Ideal School",
-      location: "Dhaka",
-      status: "Active",
-      phone: "01700000001",
-      subject: "Mathematics"
-    },
-    {
-      id: 2,
-      name: "Tanvir Hasan",
-      email: "tanvir@gmail.com",
-      institution: "Sunrise School",
-      location: "Narayanganj",
-      status: "Inactive",
-      phone: "01700000002",
-      subject: "English"
-    },
-    {
-      id: 3,
-      name: "Sadia Rahman",
-      email: "sadia@gmail.com",
-      institution: "Green Field School",
-      location: "Gazipur",
-      status: "Active",
-      phone: "01700000003",
-      subject: "Science"
-    }
-  ];
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
+
+  const fetchTeachers = async () => {
+    const res = await fetch("/api/admin/teachers");
+    const data = await res.json();
+    setTeachers(data);
+  };
 
 
   const filteredTeachers = teachers.filter(teacher =>
@@ -80,14 +58,14 @@ export default function TeacherPage() {
 
         <div className="flex items-center gap-3">
 
-          <LuSearch size={20} className="text-gray-500"/>
+          <LuSearch size={20} className="text-gray-500" />
 
           <input
             type="text"
             placeholder="Search teacher..."
             className="w-full outline-none"
             value={search}
-            onChange={(e)=>setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
           />
 
         </div>
@@ -102,7 +80,7 @@ export default function TeacherPage() {
 
         <div className="p-8 border-b flex items-center gap-3">
 
-          <LuUserCheck size={22}/>
+          <LuUserCheck size={22} />
 
           <h2 className="font-semibold text-lg">
             Teacher List
@@ -139,7 +117,7 @@ export default function TeacherPage() {
               {filteredTeachers.map(teacher => (
 
                 <tr
-                  key={teacher.id}
+                  key={teacher._id}
                   className="border-b hover:bg-gray-50"
                 >
 
@@ -166,15 +144,9 @@ export default function TeacherPage() {
                   <td>
 
                     <span
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold
-
-                      ${
-                        teacher.status === "Active"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                      }`}
+                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700"
                     >
-                      {teacher.status}
+                      Active
                     </span>
 
                   </td>
@@ -186,17 +158,17 @@ export default function TeacherPage() {
                     {/* View */}
 
                     <button
-                      onClick={()=>setSelectedTeacher(teacher)}
+                      onClick={() => setSelectedTeacher(teacher)}
                       className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
                     >
-                      <LuEye size={18}/>
+                      <LuEye size={18} />
                     </button>
 
 
                     {/* Delete */}
 
                     <button className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
-                      <LuTrash2 size={18}/>
+                      <LuTrash2 size={18} />
                     </button>
 
                   </td>
@@ -234,9 +206,9 @@ export default function TeacherPage() {
               </h2>
 
               <button
-                onClick={()=>setSelectedTeacher(null)}
+                onClick={() => setSelectedTeacher(null)}
               >
-                <LuX size={22}/>
+                <LuX size={22} />
               </button>
 
             </div>
@@ -276,23 +248,9 @@ export default function TeacherPage() {
 
 
               <div>
-                <span className="font-semibold">Phone:</span>
+                <span className="font-semibold">Verification:</span>
                 {" "}
-                {selectedTeacher.phone}
-              </div>
-
-
-              <div>
-                <span className="font-semibold">Subject:</span>
-                {" "}
-                {selectedTeacher.subject}
-              </div>
-
-
-              <div>
-                <span className="font-semibold">Status:</span>
-                {" "}
-                {selectedTeacher.status}
+                {selectedTeacher.isVerified ? "Verified" : "Unverified"}
               </div>
 
             </div>
@@ -300,7 +258,7 @@ export default function TeacherPage() {
 
 
             <button
-              onClick={()=>setSelectedTeacher(null)}
+              onClick={() => setSelectedTeacher(null)}
               className="mt-6 w-full bg-blue-900 text-white py-3 rounded-xl font-semibold"
             >
               Close
