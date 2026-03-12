@@ -17,7 +17,6 @@ export async function GET() {
         const institutionCount = institutions.length;
 
         // 2. Student Growth Data
-        // We'll get registrations per month for the last 8 months
         const eightMonthsAgo = new Date();
         eightMonthsAgo.setMonth(eightMonthsAgo.getMonth() - 8);
 
@@ -41,15 +40,12 @@ export async function GET() {
         ]);
 
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        // Convert to a map for easy lookup
         const growthMap = {};
         growth.forEach(item => {
             const key = `${monthNames[item._id.month - 1]}`;
             growthMap[key] = item.count;
         });
 
-        // Ensure we have last 8 months even if count is 0
         const finalGrowthData = [];
         let runningTotal = await User.countDocuments({ role: "student", createdAt: { $lt: eightMonthsAgo } });
 
@@ -65,6 +61,40 @@ export async function GET() {
             });
         }
 
+        // 3. Real Recent Activity
+        const recentUsers = await User.find({ role: { $in: ["student", "teacher"] } })
+            .sort({ createdAt: -1 })
+            .limit(5);
+
+        const recentExams = await Exam.find()
+            .sort({ createdAt: -1 })
+            .limit(5);
+
+        const activities = [];
+
+        recentUsers.forEach(u => {
+            activities.push({
+                text: `New ${u.role} registered: ${u.name}`,
+                date: u.createdAt
+            });
+        });
+
+        recentExams.forEach(e => {
+            activities.push({
+                text: `New exam created: ${e.title}`,
+                date: e.createdAt || e.createdAt
+            });
+        });
+
+        const sortedActivities = activities
+            .sort((a, b) => b.date - a.date)
+            .slice(0, 3)
+            .map(a => a.text);
+
+        const finalActivities = sortedActivities.length > 0
+            ? sortedActivities
+            : ["System live", "Awaiting new records", "No recent activity"];
+
         return NextResponse.json({
             stats: [
                 { label: "Students", value: studentCount.toString() },
@@ -79,11 +109,7 @@ export async function GET() {
                 { name: "Institutions", value: institutionCount },
                 { name: "Exams", value: examCount },
             ],
-            recentActivity: [
-                "System stats updated successfully",
-                `${studentCount} students currently in system`,
-                `${examCount} total exams created`
-            ]
+            recentActivity: finalActivities
         });
 
     } catch (error) {
