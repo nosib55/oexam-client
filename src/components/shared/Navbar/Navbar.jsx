@@ -338,7 +338,7 @@ const Navbar = ({ initialUser }) => {
                     {/* Profile Preview */}
                     <li>
                       <Link
-                        href="/profile"
+                        href={`/shared/publicProfile?id=${user._id}`}
                         className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 transition-all group hover:border-none outline-none"
                       >
                         <span className="p-2 bg-base-200 rounded-lg group-hover:bg-primary/20">
