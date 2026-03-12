@@ -1,74 +1,156 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState } from "react";
-import { 
-  FaPlus, 
-  FaEdit, 
-  FaTrash, 
-  FaSearch, 
-  FaFilter, 
-  FaBookOpen, 
-  FaCheckCircle, 
-  FaLayerGroup 
-} from "react-icons/fa";
-
-const questionsData = [
-  { id: 1, title: "What is React?", subject: "ICT", type: "MCQ", difficulty: "Easy", status: "Published" },
-  { id: 2, title: "Explain Photosynthesis", subject: "Biology", type: "Written", difficulty: "Medium", status: "Draft" },
-  { id: 3, title: "Solve 2x + 5 = 15", subject: "Math", type: "MCQ", difficulty: "Easy", status: "Published" },
-  { id: 4, title: "What is Newton’s Second Law?", subject: "Physics", type: "Written", difficulty: "Hard", status: "Published" },
-  { id: 5, title: "Define Democracy", subject: "Civics", type: "MCQ", difficulty: "Medium", status: "Draft" },
-  { id: 6, title: "HTML stands for?", subject: "ICT", type: "MCQ", difficulty: "Easy", status: "Published" },
-  { id: 7, title: "Explain World War II", subject: "History", type: "Written", difficulty: "Hard", status: "Published" },
-  { id: 8, title: "What is Ohm’s Law?", subject: "Physics", type: "MCQ", difficulty: "Medium", status: "Draft" },
-  { id: 9, title: "Define Ecosystem", subject: "Biology", type: "Written", difficulty: "Easy", status: "Published" },
-  { id: 10, title: "What is CSS?", subject: "ICT", type: "MCQ", difficulty: "Easy", status: "Published" },
-  { id: 11, title: "Factorize x² - 9", subject: "Math", type: "Written", difficulty: "Medium", status: "Draft" },
-  { id: 12, title: "Who discovered Gravity?", subject: "Physics", type: "MCQ", difficulty: "Easy", status: "Published" },
-];
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaSearch,
+  FaFilter,
+  FaBookOpen,
+  FaCheckCircle,
+  FaLayerGroup,
+} from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export default function QuestionsPage() {
+  const [questions, setQuestions] = useState([]); // Real Data State
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    title: "",
-    subject: "All",
-    type: "All",
-    difficulty: "All",
-    status: "All",
+    title: '',
+    subject: 'All',
+    type: 'All',
+    difficulty: 'All',
   });
 
-  const subjects = ["All", ...new Set(questionsData.map(q => q.subject))];
-  const types = ["All", ...new Set(questionsData.map(q => q.type))];
-  const difficulties = ["All", ...new Set(questionsData.map(q => q.difficulty))];
-  const statuses = ["All", ...new Set(questionsData.map(q => q.status))];
+  // ================= FETCH REAL DATA =================
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user?._id || user?.id;
+        // console.log(userId);
+        const res = await axios.get(`/api/teacher/questions?userId=${userId}`);
+        setQuestions(res.data);
+      } catch (error) {
+        console.error('Fetch Error:', error);
+        toast.error('Failed to load questions from database');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuestions();
+  }, []);
 
-  const filteredQuestions = questionsData.filter((q) =>
-    q.title.toLowerCase().includes(filters.title.toLowerCase()) &&
-    (filters.subject === "All" || q.subject === filters.subject) &&
-    (filters.type === "All" || q.type === filters.type) &&
-    (filters.difficulty === "All" || q.difficulty === filters.difficulty) &&
-    (filters.status === "All" || q.status === filters.status)
+  // ================= DELETE FUNCTION =================
+  const handleDelete = async id => {
+    // Show SweetAlert2 Confirmation Dialog
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      background: '#fff',
+      border: 'none',
+    });
+
+    // If the user confirms, proceed with deletion
+    if (result.isConfirmed) {
+      const toastId = toast.loading('Deleting from database...');
+
+      try {
+        // API call to delete
+        await axios.delete(`/api/teacher/questions/${id}`);
+
+        // Update local state to remove the question
+        setQuestions(prev => prev.filter(q => q._id !== id));
+
+        // Show Success Message
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your question has been removed.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        });
+
+        toast.success('Question removed', { id: toastId });
+      } catch (error) {
+        console.error('Delete error:', error);
+        toast.error('Failed to delete. Try again.', { id: toastId });
+
+        Swal.fire({
+          title: 'Error!',
+          text: 'Something went wrong while deleting.',
+          icon: 'error',
+        });
+      }
+    }
+  };
+
+  //
+  const subjects = ['All', ...new Set(questions.map(q => q.subject))];
+  const types = ['All', ...new Set(questions.map(q => q.type))];
+  const difficulties = ['All', ...new Set(questions.map(q => q.difficulty))];
+
+  // filter
+  const filteredQuestions = questions.filter(
+    q =>
+      (q.questionText || '')
+        .toLowerCase()
+        .includes(filters.title.toLowerCase()) &&
+      (filters.subject === 'All' || q.subject === filters.subject) &&
+      (filters.type === 'All' || q.type === filters.type) &&
+      (filters.difficulty === 'All' || q.difficulty === filters.difficulty),
   );
 
   const stats = [
-    { label: "Total Questions", value: questionsData.length, icon: <FaBookOpen />, color: "text-blue-600 bg-blue-50" },
-    { label: "Published", value: questionsData.filter(q => q.status === "Published").length, icon: <FaCheckCircle />, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Drafts", value: questionsData.filter(q => q.status === "Draft").length, icon: <FaLayerGroup />, color: "text-amber-600 bg-amber-50" },
+    {
+      label: 'Total Bank',
+      value: questions.length,
+      icon: <FaBookOpen />,
+      color: 'text-blue-600 bg-blue-50',
+    },
+    {
+      label: 'MCQs',
+      value: questions.filter(q => q.type === 'MCQ').length,
+      icon: <FaCheckCircle />,
+      color: 'text-emerald-600 bg-emerald-50',
+    },
+    {
+      label: 'Written',
+      value: questions.filter(q => q.type === 'Written').length,
+      icon: <FaLayerGroup />,
+      color: 'text-amber-600 bg-amber-50',
+    },
   ];
 
   const resetFilters = () => {
-    setFilters({ title: "", subject: "All", type: "All", difficulty: "All", status: "All" });
+    setFilters({ title: '', subject: 'All', type: 'All', difficulty: 'All' });
   };
+
+  if (loading)
+    return (
+      <div className="h-96 flex items-center justify-center font-black text-slate-300 animate-pulse tracking-[0.5em] uppercase">
+        Connecting to Bank...
+      </div>
+    );
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-10 p-4 lg:p-0">
-      {/* ================= PREMIUM HEADER ================= */}
-      <div className="relative overflow-hidden p-8 md:p-10 rounded-[3rem] bg-white border border-slate-100 shadow-2xl transition-all hover:shadow-primary/10">
+      {/* ================= HEADER ================= */}
+      <div className="relative overflow-hidden p-8 md:p-10 rounded-[3rem] bg-white border border-slate-100 shadow-2xl">
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary/10 blur-[100px] rounded-full"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
-              Resource Management
+              Database Linked
             </span>
             <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-800">
               Question <span className="text-primary">Bank</span>
@@ -110,14 +192,7 @@ export default function QuestionsPage() {
 
       {/* ================= FILTERS SECTION ================= */}
       <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm space-y-6">
-        <div className="flex items-center gap-3 mb-2">
-          <FaFilter className="text-primary" />
-          <h3 className="font-black text-slate-800 uppercase tracking-widest text-sm">
-            Advanced Filters
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="relative lg:col-span-1">
             <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
@@ -133,7 +208,6 @@ export default function QuestionsPage() {
             { label: 'Subject', key: 'subject', options: subjects },
             { label: 'Type', key: 'type', options: types },
             { label: 'Difficulty', key: 'difficulty', options: difficulties },
-            { label: 'Status', key: 'status', options: statuses },
           ].map(filter => (
             <select
               key={filter.key}
@@ -151,7 +225,6 @@ export default function QuestionsPage() {
             </select>
           ))}
         </div>
-
         <div className="flex justify-end">
           <button
             onClick={resetFilters}
@@ -162,7 +235,7 @@ export default function QuestionsPage() {
         </div>
       </div>
 
-      {/* ================= DATA TABLE ================= */}
+      {/* ================= DATA TABLE (REAL DATA) ================= */}
       <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -180,8 +253,8 @@ export default function QuestionsPage() {
                 <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   Difficulty
                 </th>
-                <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Status
+                <th className="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center pr-12">
+                  Marks
                 </th>
                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
                   Actions
@@ -191,15 +264,15 @@ export default function QuestionsPage() {
             <tbody className="divide-y divide-slate-50">
               {filteredQuestions.map((q, index) => (
                 <tr
-                  key={q.id}
+                  key={q._id}
                   className="group hover:bg-slate-50/50 transition-colors"
                 >
                   <td className="px-8 py-6 text-sm font-black text-slate-300">
                     {(index + 1).toString().padStart(2, '0')}
                   </td>
                   <td className="px-6 py-6">
-                    <p className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors leading-tight">
-                      {q.title}
+                    <p className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors leading-tight mb-1">
+                      {q.questionText}
                     </p>
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
                       {q.subject}
@@ -223,24 +296,23 @@ export default function QuestionsPage() {
                       {q.difficulty}
                     </span>
                   </td>
-                  <td className="px-6 py-6">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${q.status === 'Published' ? 'bg-primary animate-pulse' : 'bg-slate-300'}`}
-                      ></span>
-                      <span
-                        className={`text-[10px] font-black uppercase tracking-widest ${q.status === 'Published' ? 'text-slate-700' : 'text-slate-400'}`}
-                      >
-                        {q.status}
-                      </span>
-                    </div>
+                  <td className="px-6 py-6 text-center pr-12">
+                    <span className="text-xs font-black text-slate-600">
+                      {q.marks}
+                    </span>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex justify-center gap-2">
-                      <button className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary hover:text-white transition-all">
+                      <Link
+                        href={`/dashboard/teacher/questions/edit/${q._id}`}
+                        className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary hover:text-white transition-all"
+                      >
                         <FaEdit size={14} />
-                      </button>
-                      <button className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all">
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(q._id)}
+                        className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all"
+                      >
                         <FaTrash size={14} />
                       </button>
                     </div>
@@ -250,19 +322,14 @@ export default function QuestionsPage() {
             </tbody>
           </table>
         </div>
-
         {filteredQuestions.length === 0 && (
           <div className="py-20 text-center space-y-3">
-            <div className="text-4xl">🔍</div>
+            <div className="text-4xl text-slate-200 uppercase font-black">
+              Empty Bank
+            </div>
             <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
-              No matching questions found
+              No matching questions found in database
             </p>
-            <button
-              onClick={resetFilters}
-              className="text-primary text-xs font-black underline"
-            >
-              Reset Filters
-            </button>
           </div>
         )}
       </div>

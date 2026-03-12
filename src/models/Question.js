@@ -5,12 +5,31 @@ const QuestionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  options: [{
+  // Question type: MCQ, True/False or Written
+  type: {
     type: String,
+    enum: ['MCQ', 'True/False', 'Written'],
+    default: 'MCQ',
     required: true,
-  }],
+  },
+  //
+  difficulty: {
+    type: String,
+    enum: ['Easy', 'Medium', 'Hard'],
+    default: 'Easy',
+  },
+  // Options for MCQ and True/False 
+  // Can blank for Written , that's why required: false
+  options: [
+    {
+      type: String,
+      required: false,
+    },
+  ],
+  // index of right answer(for MCQ/TF)
+  // Written 
   correctAnswer: {
-    type: Number, // index of correct option
+    type: Number,
     required: true,
   },
   marks: {
@@ -32,4 +51,5 @@ const QuestionSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.Question || mongoose.model('Question', QuestionSchema);
+export default mongoose.models.Question ||
+  mongoose.model('Question', QuestionSchema);

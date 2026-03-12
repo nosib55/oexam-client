@@ -3,27 +3,10 @@ import Link from 'next/link';
 import Logo from '../Logo/Logo';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 
-const Navbar = ({ initialUser }) => {
+
+const Navbar = () => {
   const [user, setUser] = useState(null);
-  const [mounted, setMounted] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        // Sync isVerified state with stored user data on mount
-        setIsVerified(parsedUser.isVerified || false);
-      } catch (error) {
-        console.error('User parsing error:', error);
-      }
-    }
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -32,89 +15,18 @@ const Navbar = ({ initialUser }) => {
     setUser(null);
     window.location.href = '/';
   };
-
-  const handleVerifyClick = async () => {
-    // 1. Ask for email input
-    const { value: email } = await Swal.fire({
-      title: 'Verify Email',
-      input: 'email',
-      inputLabel: 'We will send a 6-digit code',
-      confirmButtonColor: '#3B82F6',
-      cancelButtonColor: '#EF4444',
-      showCancelButton: true,
-      confirmButtonText: 'Send Code',
-    });
-
-    if (email) {
-      Swal.fire({
-        title: 'Sending...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-
+   
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
       try {
-        const res = await fetch(`/api/email-verify?email=${email}`);
-        const data = await res.json();
-
-        if (res.ok) {
-          // 2. Prompt for the code received in email
-          const { value: enteredCode } = await Swal.fire({
-            title: 'Enter Code',
-            text: `Check your email: ${email}`,
-            input: 'text',
-            inputPlaceholder: '123456',
-            confirmButtonColor: '#10B981',
-            confirmButtonText: 'Verify Now',
-            showCancelButton: true,
-            cancelButtonColor: '#6B7280',
-          });
-
-          if (enteredCode === data.code.toString()) {
-            // 3. Update status in MongoDB
-            const dbUpdate = await fetch('/api/user/verify-status', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: email, status: true }),
-            });
-
-            if (dbUpdate.ok) {
-              // --- CRITICAL: Sync UI, LocalState, and LocalStorage ---
-              setIsVerified(true);
-
-              const storedUser = localStorage.getItem('user');
-              if (storedUser) {
-                const userData = JSON.parse(storedUser);
-                userData.isVerified = true; // Update property
-                localStorage.setItem('user', JSON.stringify(userData)); // Save back to storage
-                setUser(userData); // Update local user state
-              }
-
-              Swal.fire({
-                title: 'Verified!',
-                text: 'Your email is verified permanently.',
-                icon: 'success',
-                confirmButtonColor: '#3B82F6',
-              });
-            } else {
-              Swal.fire(
-                'Error',
-                'Code matched but failed to update database.',
-                'error',
-              );
-            }
-          } else if (enteredCode) {
-            Swal.fire('Error', 'The code you entered is incorrect.', 'error');
-          }
-        } else {
-          Swal.fire('Error', data.error || 'Failed to send email.', 'error');
-        }
-      } catch (err) {
-        Swal.fire('Error', 'Something went wrong. Please try again.', 'error');
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing user data', error);
       }
     }
-  };
+  }, []);
 
-  if (!mounted) return null;
 
   const navRoutes = [
     { name: 'Home', href: '/', icon: '🏠' },
@@ -205,7 +117,7 @@ const Navbar = ({ initialUser }) => {
               className="btn btn-ghost btn-circle relative group hover:bg-primary/10 transition-all duration-500 border-none !outline-none"
             >
               <div className="indicator">
-                {/* বেল আইকন */}
+                {/*  */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-7 w-7 text-base-content/70 group-hover:text-primary transition-all duration-300"
@@ -220,7 +132,7 @@ const Navbar = ({ initialUser }) => {
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                   />
                 </svg>
-                {/* রেড ডট/ব্যাজ উইথ এনিমেশন */}
+                {/*  */}
                 <span className="indicator-item flex h-4 w-4">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-4 w-4 bg-primary text-[10px] font-black text-white items-center justify-center">
@@ -230,7 +142,7 @@ const Navbar = ({ initialUser }) => {
               </div>
             </button>
 
-            {/* নোটিফিকেশন ড্রপডাউন কন্টেন্ট */}
+            {/*  */}
             <div
               tabIndex={0}
               className="mt-5 z-[60] card card-compact dropdown-content w-80 bg-base-100/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[2rem] border-none overflow-hidden"
@@ -246,7 +158,7 @@ const Navbar = ({ initialUser }) => {
                 </div>
 
                 <div className="max-h-64 overflow-y-auto px-2 py-3 space-y-1">
-                  {/* একটি স্যাম্পল নোটিফিকেশন */}
+                  {/*  */}
                   <div className="flex items-start gap-3 p-3 hover:bg-base-200/50 rounded-2xl transition-all cursor-pointer group">
                     <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
                       🚀
@@ -280,33 +192,16 @@ const Navbar = ({ initialUser }) => {
               <div className="hidden xl:flex flex-col items-end gap-0.5">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`relative flex h-2 w-2 rounded-full ${isVerified ? 'bg-blue-500' : 'bg-red-500 animate-pulse'}`}
-                  >
-                    {isVerified && (
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    )}
-                  </span>
+                    className={`relative flex h-2 w-2 rounded-full bg-blue-500 animate-pulse`}
+                  ></span>
                   <p className="text-sm font-black text-base-content tracking-tight">
                     {user.name}
                   </p>
                 </div>
                 <div className="flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 shadow-sm">
                   <span className="text-[8px] font-black uppercase text-primary tracking-widest italic">
-                    {user.role}
+                    Verified {user.role}
                   </span>
-                  <div className="mx-1.5 h-2 w-[1px] bg-primary/20"></div>
-                  {isVerified ? (
-                    <span className="text-[8px] font-bold uppercase text-blue-600">
-                      Verified
-                    </span>
-                  ) : (
-                    <button
-                      onClick={handleVerifyClick}
-                      className="text-[8px] font-bold uppercase text-red-500 hover:text-red-700 transition-all flex items-center gap-1 border-none bg-transparent p-0"
-                    >
-                      Verify Email
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -342,34 +237,10 @@ const Navbar = ({ initialUser }) => {
                       <p className="font-black text-xl text-base-content tracking-tight">
                         {user.name}
                       </p>
-                      {isVerified && (
-                        <span className="text-blue-500">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="w-5 h-5"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.491 4.491 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </span>
-                      )}
                     </div>
                     <span className="text-[10px] font-black uppercase px-3 py-1 bg-primary text-white rounded-full tracking-widest mt-2 shadow-lg shadow-primary/30">
-                      {user.role}
+                      Verified {user.role}
                     </span>
-                    {!isVerified && (
-                      <button
-                        onClick={handleVerifyClick}
-                        className="mt-3 text-[10px] font-bold uppercase text-red-500 hover:text-red-600 underline underline-offset-2"
-                      >
-                        Verify Account
-                      </button>
-                    )}
                   </div>
                   <div className="px-2 space-y-1">
                     <li>

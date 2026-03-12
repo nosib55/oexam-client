@@ -1,115 +1,130 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import {
   FaArrowLeft,
   FaSave,
   FaRegLightbulb,
-  FaPlus,
   FaCheckCircle,
 } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-export default function AddQuestionPage() {
+export default function EditQuestionPage() {
+  const params = useParams(); //id from url
+  const id = params?.id;
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
   const [questionData, setQuestionData] = useState({
     statement: '',
     subject: 'ICT',
     difficulty: 'Easy',
     marks: 1,
     type: 'MCQ',
-    correctAnswer: 0, 
+    correctAnswer: 0,
   });
 
   const [options, setOptions] = useState(['', '', '', '']);
 
-  //
+  // ================= FETCH EXISTING DATA =================
+  useEffect(() => {
+    const fetchQuestion = async () => {
+      try {
+        const res = await axios.get(`/api/teacher/questions/${id}`);
+        const data = res.data;
+
+        //
+        setQuestionData({
+          statement: data.questionText,
+          subject: data.subject,
+          difficulty: data.difficulty,
+          marks: data.marks,
+          type: data.type,
+          correctAnswer: data.correctAnswer,
+        });
+        setOptions(data.options);
+      } catch (error) {
+        toast.error('Failed to load question data');
+        router.push('/dashboard/teacher/questions');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchQuestion();
+  }, [id, router]);
+
+  // ================= HANDLERS =================
   const handleTypeChange = type => {
     setQuestionData({ ...questionData, type });
     if (type === 'True/False') {
       setOptions(['True', 'False']);
-      setQuestionData(prev => ({ ...prev, type, correctAnswer: 0 }));
-    } else {
+      setQuestionData(prev => ({ ...prev, correctAnswer: 0 }));
+    } else if (type === 'MCQ' && options.length !== 4) {
       setOptions(['', '', '', '']);
     }
   };
 
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
-  };
-
-  const handleSave = async () => {
+  const handleUpdate = async () => {
+    const toastId = toast.loading('Updating question...');
     try {
-      // LocalStorage থেকে ইউজার আইডি নিন
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userId = user?._id || user?.id;
-
-      if (!userId) {
-        toast.error('User not found. Please login again.');
-        return;
-      }
-
       const payload = {
-        statement: questionData.statement,
+        questionText: questionData.statement,
         subject: questionData.subject,
         difficulty: questionData.difficulty,
-        marks: Number(questionData.marks), 
+        marks: Number(questionData.marks),
         type: questionData.type,
         correctAnswer: questionData.correctAnswer,
         options: options,
-        userId: userId, 
       };
 
-      console.log('Sending Payload:', payload);
-      const res = await axios.post('/api/teacher/questions', payload);
-
-      if (res.status === 201) {
-        toast.success('Question saved successfully!');
-        // form reset after save
-        setQuestionData({ ...questionData, statement: '' });
-        setOptions(['', '', '', '']);
-      }
+      await axios.patch(`/api/teacher/questions/${id}`, payload);
+      toast.success('Question updated!', { id: toastId });
+      router.push('/dashboard/teacher/questions');
     } catch (error) {
-      console.error('Save Error:', error.response?.data);
-      toast.error(error.response?.data?.error || 'Failed to save question');
+      toast.error('Update failed', { id: toastId });
     }
   };
 
+  if (loading)
+    return (
+      <div className="p-20 text-center animate-pulse font-black text-slate-300">
+        LOADING QUESTION...
+      </div>
+    );
+
   return (
     <div className="max-w-4xl mx-auto pb-20 p-4 lg:p-0">
-      {/* ================= HEADER ================= */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           <Link
             href="/dashboard/teacher/questions"
-            className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary hover:shadow-lg transition-all"
+            className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary transition-all"
           >
             <FaArrowLeft />
           </Link>
           <div>
             <h1 className="text-2xl font-black text-slate-800 tracking-tight">
-              Create Question
+              Edit Question
             </h1>
             <p className="text-[10px] font-black text-primary uppercase tracking-widest">
-              Question Bank Engine
+              Update your database entry
             </p>
           </div>
         </div>
 
         <button
-          onClick={handleSave}
-          className="bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2 active:scale-95"
+          onClick={handleUpdate}
+          className="bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-2xl font-bold shadow-lg flex items-center gap-2 active:scale-95"
         >
           <FaSave size={16} />
-          <span>Save Question</span>
+          <span>Update Changes</span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* ================= MAIN FORM ================= */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
             {/* Question Title */}
@@ -125,7 +140,6 @@ export default function AddQuestionPage() {
                     statement: e.target.value,
                   })
                 }
-                placeholder="Type your question here..."
                 className="w-full p-5 rounded-3xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 min-h-[120px] font-bold text-slate-700 transition-all shadow-inner"
               />
             </div>
@@ -133,7 +147,7 @@ export default function AddQuestionPage() {
             {/* Config Grid */}
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   Subject
                 </label>
                 <select
@@ -144,7 +158,7 @@ export default function AddQuestionPage() {
                       subject: e.target.value,
                     })
                   }
-                  className="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-slate-600 text-sm cursor-pointer"
+                  className="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-slate-600 text-sm"
                 >
                   <option>ICT</option>
                   <option>Math</option>
@@ -152,7 +166,7 @@ export default function AddQuestionPage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   Difficulty
                 </label>
                 <select
@@ -163,7 +177,7 @@ export default function AddQuestionPage() {
                       difficulty: e.target.value,
                     })
                   }
-                  className="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-slate-600 text-sm cursor-pointer"
+                  className="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-slate-600 text-sm"
                 >
                   <option>Easy</option>
                   <option>Medium</option>
@@ -171,7 +185,7 @@ export default function AddQuestionPage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   Marks
                 </label>
                 <input
@@ -187,7 +201,7 @@ export default function AddQuestionPage() {
 
             {/* Type Switcher */}
             <div className="space-y-4 pt-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                 Question Type
               </label>
               <div className="flex p-1.5 bg-slate-50 rounded-2xl w-fit">
@@ -198,7 +212,7 @@ export default function AddQuestionPage() {
                     className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                       questionData.type === type
                         ? 'bg-white text-primary shadow-sm'
-                        : 'text-slate-400 hover:text-slate-600'
+                        : 'text-slate-400'
                     }`}
                   >
                     {type}
@@ -207,24 +221,21 @@ export default function AddQuestionPage() {
               </div>
             </div>
 
-            {/* MCQ & True/False Options Section */}
+            {/* Options Section */}
             {(questionData.type === 'MCQ' ||
               questionData.type === 'True/False') && (
               <div className="space-y-4 pt-4 border-t border-slate-50">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                  Answer Options (Select the correct one)
-                </label>
                 <div className="grid gap-3">
                   {options.map((opt, i) => (
-                    <div key={i} className="flex items-center gap-3 group">
+                    <div key={i} className="flex items-center gap-3">
                       <button
                         onClick={() =>
                           setQuestionData({ ...questionData, correctAnswer: i })
                         }
                         className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs transition-all ${
                           questionData.correctAnswer === i
-                            ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200'
-                            : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
+                            ? 'bg-emerald-500 text-white'
+                            : 'bg-slate-100 text-slate-400'
                         }`}
                       >
                         {questionData.correctAnswer === i ? (
@@ -235,15 +246,18 @@ export default function AddQuestionPage() {
                       </button>
                       <input
                         type="text"
-                        placeholder={`Option ${i + 1}`}
-                        className={`flex-1 p-4 rounded-2xl border-none focus:ring-2 focus:ring-primary/20 text-sm font-bold transition-all ${
+                        value={opt}
+                        onChange={e => {
+                          const newOpts = [...options];
+                          newOpts[i] = e.target.value;
+                          setOptions(newOpts);
+                        }}
+                        disabled={questionData.type === 'True/False'}
+                        className={`flex-1 p-4 rounded-2xl border-none text-sm font-bold ${
                           questionData.correctAnswer === i
                             ? 'bg-emerald-50 text-emerald-700'
                             : 'bg-slate-50 text-slate-600'
                         }`}
-                        value={opt}
-                        onChange={e => handleOptionChange(i, e.target.value)}
-                        disabled={questionData.type === 'True/False'}
                       />
                     </div>
                   ))}
@@ -253,26 +267,20 @@ export default function AddQuestionPage() {
           </div>
         </div>
 
-        {/* ================= SIDEBAR HELP ================= */}
+        {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 space-y-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16"></div>
+          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 relative overflow-hidden">
             <div className="relative z-10 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500">
                 <FaRegLightbulb size={24} />
               </div>
-              <h3 className="text-xl font-black tracking-tight leading-tight">
-                Pro Tips
+              <h3 className="text-xl font-black tracking-tight">
+                Editing Mode
               </h3>
-              <ul className="space-y-4 text-slate-400 text-[11px] font-bold leading-relaxed uppercase tracking-wide">
-                <li className="flex gap-3">
-                  <span className="text-primary">•</span> Try to similler option with MCQ
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-primary">•</span> Correct answer btn
-                  (A, B, C...) mark by click
-                </li>
-              </ul>
+              <p className="text-xs font-bold text-slate-400 leading-relaxed uppercase">
+                You are modifying an existing question. Changes will reflect
+                across all exams using this question.
+              </p>
             </div>
           </div>
         </div>
