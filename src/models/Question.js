@@ -12,7 +12,7 @@ const QuestionSchema = new mongoose.Schema({
     default: 'MCQ',
     required: true,
   },
-  // প্রশ্নের কঠিনতা
+  //
   difficulty: {
     type: String,
     enum: ['Easy', 'Medium', 'Hard'],
