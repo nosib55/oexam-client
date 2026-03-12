@@ -33,10 +33,40 @@ const UserSchema = new mongoose.Schema(
         return this.role !== "admin";
       },
     },
+
+    userClass: {
+      type: String,
+    },
+
+    image: {
+      type: String,
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    location: {
+      type: String,
+    },
+
+    otp: {
+      type: String,
+    },
+
+    otpExpires: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.models.User || mongoose.model("User", UserSchema);
+if (mongoose.models.User) {
+  mongoose.deleteModel("User");
+}
+
+const User = mongoose.model("User", UserSchema);
+export default User;

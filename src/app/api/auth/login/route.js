@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
+import { sendOTP } from "@/lib/email";
 
 export async function POST(req) {
   try {
@@ -44,6 +45,40 @@ export async function POST(req) {
       );
     }
 
+    // Check if user is verified
+    if (!user.isVerified) {
+      // Generate NEW 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+      user.otp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
+
+      // Try sending real email (SMTP setup)
+      try {
+        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+          await sendOTP(email, otp);
+        }
+      } catch (e) {
+        console.error("Email delivery failed during login:", e);
+      }
+
+      // Always log to terminal for local backup
+      console.log(`\n================================`);
+      console.log(`🔐 NEW OTP for ${email} (Login Attempt): ${otp}`);
+      console.log(`================================\n`);
+
+      return NextResponse.json(
+        {
+          message: "Account not verified. A new OTP has been sent to your email.",
+          unverified: true,
+          email: email
+        },
+        { status: 403 }
+      );
+    }
+
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -73,16 +108,17 @@ export async function POST(req) {
         name: user.name,
         email: user.email,
         role: user.role,
+        class: user.userClass,
       },
     });
 
-    // for development, let client set the cookie (remove httpOnly for debugging)
-    // response.cookies.set("token", token, {
-    //   httpOnly: true,
-    //   path: "/",
-    //   maxAge: 60 * 60 * 24 * 7, // 7 days
-    //   sameSite: "lax",
-    // });
+    // Set cookie for middleware
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: "lax",
+    });
 
     return response;
 
