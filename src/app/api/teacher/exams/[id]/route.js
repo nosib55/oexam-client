@@ -10,7 +10,7 @@ export async function GET(req, { params }) {
     await connectDB();
     const { id } = await params; // Next.js 15 needs await
 
-    const exam = await Exam.findById(id);
+    const exam = await Exam.findById(id).populate('questions');
     if (!exam) {
       return NextResponse.json({ error: 'Exam not found' }, { status: 404 });
     }

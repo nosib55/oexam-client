@@ -17,28 +17,45 @@ import { toast } from 'react-hot-toast';
 
 const ExamList = () => {
   const [exams, setExams] = useState([]);
+  const [allQuestions, setAllQuestions] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    fetchExams();
-  }, []);
-
-  const fetchExams = async () => {
+  //
+  const fetchData = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       if (user) {
-        const res = await axios.get(
-          `/api/teacher/exams?userId=${user._id || user.id}`,
-        );
-        setExams(res.data);
+        const userId = user._id || user.id;
+
+        //
+        const [examsRes, questionsRes] = await Promise.all([
+          axios.get(`/api/teacher/exams?userId=${userId}`),
+          axios.get(`/api/teacher/questions?userId=${userId}`),
+        ]);
+
+        setExams(examsRes.data);
+        setAllQuestions(questionsRes.data);
       }
     } catch (error) {
-      console.error('Error fetching exams:', error);
+      console.error('Error fetching data:', error);
+      toast.error('Failed to sync repository');
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  //
+  const getQuestionCountBySubject = subjectName => {
+    if (!allQuestions || !subjectName) return 0;
+    return allQuestions.filter(
+      q => q.subject?.toLowerCase() === subjectName.toLowerCase(),
+    ).length;
   };
 
   // ================= DELETE HANDLER =================
@@ -112,7 +129,7 @@ const ExamList = () => {
           </div>
         )}
 
-        {/* Mobile View Action Buttons */}
+        {/* Mobile View */}
         <div className="block md:hidden divide-y divide-slate-100">
           {filteredExams.map(exam => (
             <div key={exam._id} className="p-6 space-y-4">
@@ -128,6 +145,16 @@ const ExamList = () => {
                   </h3>
                 </div>
                 <div className="flex gap-1">
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/teacher/exams/preview/${exam._id}`,
+                      )
+                    }
+                    className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm"
+                  >
+                    <LuEye size={16} />
+                  </button>
                   <button
                     onClick={() =>
                       router.push(`/dashboard/teacher/exams/edit/${exam._id}`)
@@ -152,14 +179,15 @@ const ExamList = () => {
                 </div>
                 <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                   <LuUsers className="text-primary" />
-                  {exam.questions?.length || 0} Questions
+                  {/*  */}
+                  {getQuestionCountBySubject(exam.subject)} Questions
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Desktop View Action Buttons */}
+        {/* Desktop View */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50/50 border-b border-slate-100">
@@ -198,12 +226,17 @@ const ExamList = () => {
                     </span>
                   </td>
                   <td className="px-6 py-6 text-sm font-bold text-slate-500">
-                    {exam.questions?.length || 0} Qs
+                    {/* */}
+                    {getQuestionCountBySubject(exam.subject)} Qs
                   </td>
                   <td className="px-6 py-6">
                     <div className="flex items-center justify-center gap-2">
                       <button
-                        title="View Details"
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/teacher/exams/preview/${exam._id}`,
+                          )
+                        }
                         className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm"
                       >
                         <LuEye size={16} />
@@ -214,14 +247,12 @@ const ExamList = () => {
                             `/dashboard/teacher/exams/edit/${exam._id}`,
                           )
                         }
-                        title="Edit Exam"
                         className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-amber-500 hover:text-white transition-all shadow-sm"
                       >
                         <LuPencil size={16} />
                       </button>
                       <button
                         onClick={() => handleDelete(exam._id)}
-                        title="Delete Exam"
                         className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-500 hover:text-white transition-all shadow-sm"
                       >
                         <LuTrash2 size={16} />
