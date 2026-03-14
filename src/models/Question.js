@@ -18,7 +18,7 @@ const QuestionSchema = new mongoose.Schema({
     enum: ['Easy', 'Medium', 'Hard'],
     default: 'Easy',
   },
-  // Options for MCQ and True/False 
+  // Options for MCQ and True/False
   // Can blank for Written , that's why required: false
   options: [
     {
@@ -27,9 +27,9 @@ const QuestionSchema = new mongoose.Schema({
     },
   ],
   // index of right answer(for MCQ/TF)
-  // Written 
+  // Written
   correctAnswer: {
-    type: Number,
+    type: mongoose.Schema.Types.Mixed,
     required: true,
   },
   marks: {

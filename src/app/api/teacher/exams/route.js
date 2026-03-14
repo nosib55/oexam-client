@@ -1,6 +1,7 @@
 import connectDB from '@/lib/mongodb';
 import Exam from '@/models/Exam';
 import { NextResponse } from 'next/server';
+import Question from '@/models/Question';
 
 export async function GET(req) {
   try {
@@ -18,9 +19,9 @@ export async function GET(req) {
     }
 
     // user based exam lists leatest
-    const exams = await Exam.find({ createdBy: userId }).sort({
+    const exams = await Exam.find({ createdBy: userId }).populate({path: 'questions', model: 'Question'}).sort({
       createdAt: -1,
-    });
+    }).lean();
 
     return NextResponse.json(exams, { status: 200 });
   } catch (error) {

@@ -6,20 +6,22 @@ import {
   FaArrowLeft,
   FaSave,
   FaRegLightbulb,
-  FaPlus,
   FaCheckCircle,
 } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useParams } from 'next/navigation';
 
 export default function AddQuestionPage() {
+  const params = useParams();
+  const examId = params.id;
   const [questionData, setQuestionData] = useState({
     statement: '',
-    subject: 'ICT',
+    subject: '',
     difficulty: 'Easy',
     marks: 1,
     type: 'MCQ',
-    correctAnswer: 0, 
+    correctAnswer: 0,
   });
 
   const [options, setOptions] = useState(['', '', '', '']);
@@ -43,7 +45,7 @@ export default function AddQuestionPage() {
 
   const handleSave = async () => {
     try {
-      // LocalStorage থেকে ইউজার আইডি নিন
+      // user id from LocalStorage
       const user = JSON.parse(localStorage.getItem('user'));
       const userId = user?._id || user?.id;
 
@@ -52,15 +54,25 @@ export default function AddQuestionPage() {
         return;
       }
 
+      if (!questionData.subject.trim()) {
+        toast.error('Please enter a subject name!');
+        return;
+      }
+      if (!questionData.statement.trim()) {
+        toast.error('Question statement cannot be empty!');
+        return;
+      }
+
       const payload = {
         statement: questionData.statement,
-        subject: questionData.subject,
+        subject: questionData.subject.trim(),
         difficulty: questionData.difficulty,
-        marks: Number(questionData.marks), 
+        marks: Number(questionData.marks),
         type: questionData.type,
         correctAnswer: questionData.correctAnswer,
         options: options,
-        userId: userId, 
+        userId: userId,
+        examId: examId,
       };
 
       console.log('Sending Payload:', payload);
@@ -77,6 +89,7 @@ export default function AddQuestionPage() {
       toast.error(error.response?.data?.error || 'Failed to save question');
     }
   };
+
 
   return (
     <div className="max-w-4xl mx-auto pb-20 p-4 lg:p-0">
@@ -132,11 +145,14 @@ export default function AddQuestionPage() {
 
             {/* Config Grid */}
             <div className="grid grid-cols-3 gap-4">
+              {/* Subject Input */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
                   Subject
                 </label>
-                <select
+                <input
+                  type="text"
+                  placeholder="e.g. Physics, Math"
                   value={questionData.subject}
                   onChange={e =>
                     setQuestionData({
@@ -144,12 +160,8 @@ export default function AddQuestionPage() {
                       subject: e.target.value,
                     })
                   }
-                  className="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-slate-600 text-sm cursor-pointer"
-                >
-                  <option>ICT</option>
-                  <option>Math</option>
-                  <option>Physics</option>
-                </select>
+                  className="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-slate-600 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner placeholder:text-slate-300"
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
@@ -266,11 +278,12 @@ export default function AddQuestionPage() {
               </h3>
               <ul className="space-y-4 text-slate-400 text-[11px] font-bold leading-relaxed uppercase tracking-wide">
                 <li className="flex gap-3">
-                  <span className="text-primary">•</span> Try to similler option with MCQ
+                  <span className="text-primary">•</span> Try to similler option
+                  with MCQ
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-primary">•</span> Correct answer btn
-                  (A, B, C...) mark by click
+                  <span className="text-primary">•</span> Correct answer btn (A,
+                  B, C...) mark by click
                 </li>
               </ul>
             </div>

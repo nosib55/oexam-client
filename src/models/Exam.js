@@ -20,10 +20,13 @@ const ExamSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  questions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Question',
-  }],
+  markPerQuestion: { type: Number },
+  questions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question',
+    },
+  ],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

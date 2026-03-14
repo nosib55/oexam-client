@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import { toast } from 'react-hot-toast';
 import {
   FaSearch,
   FaEye,
@@ -13,38 +15,96 @@ import {
   FaClock,
   FaFileAlt,
   FaFilter,
-  FaTv,
   FaSpinner,
+  FaLayerGroup,
 } from 'react-icons/fa';
 
 export default function ExamsPage() {
   const [examsData, setExamsData] = useState([]);
+  const [allQuestions, setAllQuestions] = useState([]); // নতুন স্টেট সব প্রশ্নের জন্য
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // get data from mongodb
-  useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-          const res = await axios.get(
-            `/api/teacher/exams?userId=${user._id || user.id}`,
-          );
-          setExamsData(res.data);
-        }
-      } catch (error) {
-        console.error('Error fetching exams:', error);
-      } finally {
-        setLoading(false);
+  // Fetch all data (Exams and Questions)
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (storedUser) {
+        const userId = storedUser._id || storedUser.id;
+
+        // এক্সাম এবং কোয়েশ্চেন দুটি আলাদা API থেকে কল করা হচ্ছে
+        const [examsRes, questionsRes] = await Promise.all([
+          axios.get(`/api/teacher/exams?userId=${userId}`),
+          axios.get(`/api/teacher/questions?userId=${userId}`),
+        ]);
+
+        setExamsData(examsRes.data);
+        setAllQuestions(questionsRes.data);
       }
-    };
-    fetchExams();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
-  // dynamic filtering
+  // সাবজেক্ট অনুযায়ী প্রশ্ন সংখ্যা বের করার লজিক
+  const getQuestionCountBySubject = (questions, subjectName) => {
+    if (!questions || !subjectName) return 0;
+    const filtered = questions.filter(
+      q => q.subject?.toLowerCase() === subjectName.toLowerCase(),
+    );
+    return filtered.length;
+  };
+
+  // ================= DELETE HANDLER =================
+  const handleDelete = async id => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#4F46E5',
+      cancelButtonColor: '#F43F5E',
+      confirmButtonText: 'Yes, delete it!',
+      background: '#ffffff',
+      customClass: {
+        popup: 'rounded-[2rem] font-bold',
+        confirmButton: 'rounded-xl px-6 py-3',
+        cancelButton: 'rounded-xl px-6 py-3',
+      },
+    });
+
+    if (result.isConfirmed) {
+      const toastId = toast.loading('Deleting exam...');
+      try {
+        await axios.delete(`/api/teacher/exams/${id}`);
+        setExamsData(prev => prev.filter(exam => exam._id !== id));
+        toast.success('Exam removed from archive', { id: toastId });
+
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'The exam has been removed.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          customClass: { popup: 'rounded-[2rem]' },
+        });
+      } catch (error) {
+        toast.error('Deletion failed!', { id: toastId });
+      }
+    }
+  };
+
+  // Dynamic Filtering Logic
   const filteredExams = examsData.filter(exam => {
     const title = exam.title || exam.examName || '';
     return (
@@ -54,6 +114,12 @@ export default function ExamsPage() {
     );
   });
 
+  // Unique subjects for filter
+  const uniqueSubjects = [
+    ...new Set(examsData.map(exam => exam.subject)),
+  ].filter(Boolean);
+
+  // Calculate Stats Dynamically
   const stats = [
     {
       label: 'Total Exams',
@@ -63,26 +129,21 @@ export default function ExamsPage() {
     },
     {
       label: 'Published',
-      value: examsData.filter(
-        e => e.status === 'published' || e.status === 'Active',
-      ).length,
+      value: examsData.filter(e => e.status?.toLowerCase() === 'published')
+        .length,
       icon: <FaCalendarAlt />,
       color: 'text-emerald-600 bg-emerald-50',
     },
     {
       label: 'Saved Draft',
-      value: examsData.filter(e => e.status === 'draft' || e.status === 'Draft')
-        .length,
+      value: examsData.filter(e => e.status?.toLowerCase() === 'draft').length,
       icon: <FaEdit />,
       color: 'text-amber-600 bg-amber-50',
     },
     {
       label: 'Questions Set',
-      value: examsData.reduce(
-        (acc, curr) => acc + (curr.questions?.length || 0),
-        0,
-      ),
-      icon: <FaClock />,
+      value: allQuestions.length, // এটি এখন পুরো কোয়েশ্চেন ব্যাংকের সংখ্যা দেখাবে
+      icon: <FaLayerGroup />,
       color: 'text-indigo-600 bg-indigo-50',
     },
   ];
@@ -100,8 +161,8 @@ export default function ExamsPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-20 p-4 lg:p-0">
-      {/* HEADER */}
-      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3.5rem] bg-white border border-slate-100 shadow-2xl shadow-slate-200/50 transition-all">
+      {/* HEADER SECTION */}
+      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3.5rem] bg-white border border-slate-100 shadow-2xl shadow-slate-200/50">
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary/5 blur-[120px] rounded-full"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div className="space-y-2">
@@ -148,7 +209,7 @@ export default function ExamsPage() {
         ))}
       </div>
 
-      {/* FILTERS & QUICK NAV  */}
+      {/* FILTERS */}
       <div className="flex flex-col xl:flex-row gap-6 items-stretch">
         <div className="flex-1 bg-white p-6 md:p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4">
           <div className="relative flex-[2]">
@@ -168,11 +229,11 @@ export default function ExamsPage() {
               onChange={e => setSubjectFilter(e.target.value)}
             >
               <option value="">All Subjects</option>
-              <option>Mathematics</option>
-              <option>Physics</option>
-              <option>Chemistry</option>
-              <option>English</option>
-              <option>ICT</option>
+              {uniqueSubjects.map((sub, index) => (
+                <option key={index} value={sub}>
+                  {sub}
+                </option>
+              ))}
             </select>
             <FaFilter
               className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
@@ -182,7 +243,7 @@ export default function ExamsPage() {
         </div>
       </div>
 
-      {/* ================= EXAMS TABLE (DYNAMIC) ================= */}
+      {/* DYNAMIC EXAMS TABLE */}
       <div className="bg-white rounded-[3.5rem] border border-slate-100 shadow-sm overflow-hidden p-4 md:p-6">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-separate border-spacing-y-4">
@@ -195,7 +256,7 @@ export default function ExamsPage() {
                   Category
                 </th>
                 <th className="px-6 py-2 text-[10px] font-black uppercase tracking-[0.2em]">
-                  Time & Marks
+                  Questions
                 </th>
                 <th className="px-6 py-2 text-[10px] font-black uppercase tracking-[0.2em]">
                   Status
@@ -206,7 +267,7 @@ export default function ExamsPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredExams.slice(0,5).map(exam => (
+              {filteredExams.map(exam => (
                 <tr
                   key={exam._id}
                   className="group hover:bg-slate-50/50 transition-all"
@@ -219,8 +280,9 @@ export default function ExamsPage() {
                       <div className="flex items-center gap-2 mt-1">
                         <FaCalendarAlt size={10} className="text-slate-300" />
                         <span className="text-[10px] font-bold text-slate-400">
-                          Scheduled:{' '}
-                          {new Date(exam.scheduledAt).toLocaleDateString()}
+                          {exam.scheduledAt
+                            ? new Date(exam.scheduledAt).toLocaleDateString()
+                            : 'No date set'}
                         </span>
                       </div>
                     </div>
@@ -231,26 +293,23 @@ export default function ExamsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-6 bg-slate-50/30 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <FaClock size={12} className="text-slate-300" />
-                        <span className="text-xs font-black text-slate-700">
-                          {exam.duration}m
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        {exam.totalMarks} Points
+                    <div className="flex flex-col">
+                      <span className="text-xs font-black text-slate-700">
+                        {/* সাবজেক্ট অনুযায়ী অটোমেটিক প্রশ্নের সংখ্যা এখানে বসছে */}
+                        {getQuestionCountBySubject(allQuestions, exam.subject)}{' '}
+                        Items
+                      </span>
+                      <span className="text-[9px] text-slate-400 font-bold uppercase">
+                        {exam.duration || 0} mins
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-6 bg-slate-50/30 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all">
                     <span
                       className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.15em] border ${
-                        exam.status === 'published'
+                        exam.status?.toLowerCase() === 'published'
                           ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                          : exam.status === 'draft'
-                            ? 'bg-amber-50 text-amber-600 border-amber-100'
-                            : 'bg-blue-50 text-blue-600 border-blue-100'
+                          : 'bg-amber-50 text-amber-600 border-amber-100'
                       }`}
                     >
                       {exam.status}
@@ -260,17 +319,20 @@ export default function ExamsPage() {
                     <div className="flex justify-center gap-3">
                       <Link
                         href={`/dashboard/teacher/exams/preview/${exam._id}`}
-                        className="w-10 h-10 rounded-xl bg-white text-slate-400 hover:text-blue-600 hover:shadow-lg transition-all flex items-center justify-center border border-slate-100 shadow-sm"
+                        className="w-10 h-10 rounded-xl bg-white text-slate-400 hover:text-blue-600 hover:shadow-lg transition-all flex items-center justify-center border border-slate-100"
                       >
                         <FaEye size={14} />
                       </Link>
                       <Link
-                        href={`/dashboard/teacher/set-questions/${exam._id}`}
-                        className="w-10 h-10 rounded-xl bg-white text-slate-400 hover:text-amber-600 hover:shadow-lg transition-all flex items-center justify-center border border-slate-100 shadow-sm"
+                        href={`/dashboard/teacher/exams/edit/${exam._id}`}
+                        className="w-10 h-10 rounded-xl bg-white text-slate-400 hover:text-amber-600 hover:shadow-lg transition-all flex items-center justify-center border border-slate-100"
                       >
                         <FaEdit size={14} />
                       </Link>
-                      <button className="w-10 h-10 rounded-xl bg-white text-slate-400 hover:text-rose-600 hover:shadow-lg transition-all flex items-center justify-center border border-slate-100 shadow-sm">
+                      <button
+                        onClick={() => handleDelete(exam._id)}
+                        className="w-10 h-10 rounded-xl bg-white text-slate-400 hover:text-rose-600 hover:shadow-lg transition-all flex items-center justify-center border border-slate-100"
+                      >
                         <FaTrash size={14} />
                       </button>
                     </div>
@@ -280,25 +342,19 @@ export default function ExamsPage() {
             </tbody>
           </table>
         </div>
-        {filteredExams.length === 0 && (
-          <div className="py-24 text-center">
-            <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
-              No matching exams found
-            </p>
-          </div>
-        )}
-
       </div>
-        <div className="flex justify-center pt-4">
-          <Link
-            href={'/dashboard/teacher/exams/examList'}
-            className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-primary transition-all"
-          >
-            <span className="w-12 h-[1px] bg-slate-200 group-hover:bg-primary transition-all"></span>
-            View All Archives
-            <span className="w-12 h-[1px] bg-slate-200 group-hover:bg-primary transition-all"></span>
-          </Link>
-        </div>
+
+      {/* FOOTER NAV */}
+      <div className="flex justify-center pt-4">
+        <Link
+          href={'/dashboard/teacher/exams/examList'}
+          className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-primary transition-all"
+        >
+          <span className="w-12 h-[1px] bg-slate-200 group-hover:bg-primary transition-all"></span>
+          View All Archives
+          <span className="w-12 h-[1px] bg-slate-200 group-hover:bg-primary transition-all"></span>
+        </Link>
+      </div>
     </div>
   );
 }

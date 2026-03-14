@@ -3,36 +3,84 @@ import React, { useState, useEffect } from 'react';
 import {
   LuSearch,
   LuFilter,
-  LuEllipsisVertical,
   LuUsers,
   LuCalendar,
   LuLoader,
+  LuTrash2,
+  LuPencil,
+  LuEye,
 } from 'react-icons/lu';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
+import { toast } from 'react-hot-toast';
 
 const ExamList = () => {
   const [exams, setExams] = useState([]);
+  const [allQuestions, setAllQuestions] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter();
+
+  //
+  const fetchData = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        const userId = user._id || user.id;
+
+        //
+        const [examsRes, questionsRes] = await Promise.all([
+          axios.get(`/api/teacher/exams?userId=${userId}`),
+          axios.get(`/api/teacher/questions?userId=${userId}`),
+        ]);
+
+        setExams(examsRes.data);
+        setAllQuestions(questionsRes.data);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to sync repository');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-          const res = await axios.get(
-            `/api/teacher/exams?userId=${user._id || user.id}`,
-          );
-          setExams(res.data);
-        }
-      } catch (error) {
-        console.error('Error fetching exams:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchExams();
+    fetchData();
   }, []);
+
+  //
+  const getQuestionCountBySubject = subjectName => {
+    if (!allQuestions || !subjectName) return 0;
+    return allQuestions.filter(
+      q => q.subject?.toLowerCase() === subjectName.toLowerCase(),
+    ).length;
+  };
+
+  // ================= DELETE HANDLER =================
+  const handleDelete = async id => {
+    const result = await Swal.fire({
+      title: 'Delete Exam?',
+      text: 'This will permanently remove the exam record.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#94a3b8',
+      confirmButtonText: 'Yes, delete it!',
+    });
+
+    if (result.isConfirmed) {
+      const tid = toast.loading('Deleting exam...');
+      try {
+        await axios.delete(`/api/teacher/exams/${id}`);
+        setExams(prev => prev.filter(e => e._id !== id));
+        toast.success('Exam deleted', { id: tid });
+      } catch (error) {
+        toast.error('Failed to delete', { id: tid });
+      }
+    }
+  };
 
   // search filtering
   const filteredExams = exams.filter(
@@ -75,7 +123,6 @@ const ExamList = () => {
 
       {/* ================= TABLE CONTAINER ================= */}
       <div className="bg-white rounded-[2rem] border border-slate-200/60 overflow-hidden shadow-sm">
-        {/* if there no exam */}
         {filteredExams.length === 0 && (
           <div className="p-20 text-center font-bold text-slate-400">
             No exams found. Create your first exam!
@@ -85,18 +132,11 @@ const ExamList = () => {
         {/* Mobile View */}
         <div className="block md:hidden divide-y divide-slate-100">
           {filteredExams.map(exam => (
-            <div
-              key={exam._id}
-              className="p-6 space-y-4 active:bg-slate-50 transition-colors"
-            >
+            <div key={exam._id} className="p-6 space-y-4">
               <div className="flex justify-between items-start">
                 <div>
                   <span
-                    className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${
-                      exam.status === 'published'
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : 'bg-slate-100 text-slate-500'
-                    }`}
+                    className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${exam.status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}
                   >
                     {exam.status}
                   </span>
@@ -104,9 +144,32 @@ const ExamList = () => {
                     {exam.title}
                   </h3>
                 </div>
-                <button className="p-2 text-slate-400">
-                  <LuEllipsisVertical />
-                </button>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/teacher/exams/preview/${exam._id}`,
+                      )
+                    }
+                    className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm"
+                  >
+                    <LuEye size={16} />
+                  </button>
+                  <button
+                    onClick={() =>
+                      router.push(`/dashboard/teacher/exams/edit/${exam._id}`)
+                    }
+                    className="p-2 text-blue-500 bg-blue-50 rounded-lg"
+                  >
+                    <LuPencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(exam._id)}
+                    className="p-2 text-rose-500 bg-rose-50 rounded-lg"
+                  >
+                    <LuTrash2 size={16} />
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -116,7 +179,8 @@ const ExamList = () => {
                 </div>
                 <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                   <LuUsers className="text-primary" />
-                  {exam.questions?.length || 0} Questions
+                  {/*  */}
+                  {getQuestionCountBySubject(exam.subject)} Questions
                 </div>
               </div>
             </div>
@@ -132,7 +196,7 @@ const ExamList = () => {
                 <th className="px-6 py-5">Subject</th>
                 <th className="px-6 py-5">Status</th>
                 <th className="px-6 py-5">Questions</th>
-                <th className="px-6 py-5 text-right">Action</th>
+                <th className="px-6 py-5 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -156,22 +220,44 @@ const ExamList = () => {
                   </td>
                   <td className="px-6 py-6">
                     <span
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${
-                        exam.status === 'published'
-                          ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100'
-                          : 'bg-slate-100 text-slate-500'
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${exam.status === 'published' ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : 'bg-slate-100 text-slate-500'}`}
                     >
                       {exam.status}
                     </span>
                   </td>
                   <td className="px-6 py-6 text-sm font-bold text-slate-500">
-                    {exam.questions?.length || 0} Qs
+                    {/* */}
+                    {getQuestionCountBySubject(exam.subject)} Qs
                   </td>
-                  <td className="px-6 py-6 text-right">
-                    <button className="p-2.5 hover:bg-white hover:shadow-md rounded-xl transition-all text-slate-400 hover:text-primary border border-transparent hover:border-slate-100">
-                      <LuEllipsisVertical />
-                    </button>
+                  <td className="px-6 py-6">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/teacher/exams/preview/${exam._id}`,
+                          )
+                        }
+                        className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm"
+                      >
+                        <LuEye size={16} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/teacher/exams/edit/${exam._id}`,
+                          )
+                        }
+                        className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-amber-500 hover:text-white transition-all shadow-sm"
+                      >
+                        <LuPencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(exam._id)}
+                        className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                      >
+                        <LuTrash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

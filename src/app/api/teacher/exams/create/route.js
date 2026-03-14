@@ -6,15 +6,17 @@ export async function POST(req) {
   try {
     await connectDB();
     const body = await req.json();
+    const combinedDateTime = new Date(`${body.examDate}T${body.examTime}`);
 
     const examData = {
       title: body.examName,
-      subject: body.subject,
+      subject: body.subject.trim(),
       duration: Number(body.duration),
-      totalMarks: Number(body.totalMarks) || 100, 
-      createdBy: body.userId, 
-      scheduledAt: body.scheduledAt || new Date(),
+      totalMarks: Number(body.totalMarks) || 100,
+      createdBy: body.userId,
+      scheduledAt: combinedDateTime,
       status: 'draft',
+      questions: [],
     };
 
     const newExam = await Exam.create(examData);
