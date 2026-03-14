@@ -1,7 +1,9 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useState } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import {
   FaSearch,
   FaDownload,
@@ -11,107 +13,47 @@ import {
   FaUserGraduate,
   FaFilter,
   FaPenNib,
+  FaSpinner,
 } from 'react-icons/fa';
 
-const resultsData = [
-  {
-    id: 1,
-    student: 'Ayesha Rahman',
-    exam: 'Mid Term ICT',
-    marks: 85,
-    grade: 'A',
-    status: 'Pass',
-  },
-  {
-    id: 2,
-    student: 'Rakib Hasan',
-    exam: 'Mid Term ICT',
-    marks: 42,
-    grade: 'D',
-    status: 'Fail',
-  },
-  {
-    id: 3,
-    student: 'Nusrat Jahan',
-    exam: 'Final Math',
-    marks: 76,
-    grade: 'B',
-    status: 'Pass',
-  },
-  {
-    id: 4,
-    student: 'Tanvir Ahmed',
-    exam: 'Final Math',
-    marks: 91,
-    grade: 'A+',
-    status: 'Pass',
-  },
-  {
-    id: 5,
-    student: 'Mim Akter',
-    exam: 'Physics Test',
-    marks: 58,
-    grade: 'C',
-    status: 'Pass',
-  },
-  {
-    id: 6,
-    student: 'Sabbir Hossain',
-    exam: 'Physics Test',
-    marks: 37,
-    grade: 'F',
-    status: 'Fail',
-  },
-  {
-    id: 7,
-    student: 'Farhana Islam',
-    exam: 'Mid Term ICT',
-    marks: 88,
-    grade: 'A',
-    status: 'Pass',
-  },
-  {
-    id: 8,
-    student: 'Jahidul Islam',
-    exam: 'Final Math',
-    marks: 64,
-    grade: 'B',
-    status: 'Pass',
-  },
-  {
-    id: 9,
-    student: 'Tania Sultana',
-    exam: 'Physics Test',
-    marks: 73,
-    grade: 'B',
-    status: 'Pass',
-  },
-  {
-    id: 10,
-    student: 'Imran Khan',
-    exam: 'Mid Term ICT',
-    marks: 49,
-    grade: 'D',
-    status: 'Fail',
-  },
-];
-
 export default function ResultsPage() {
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [examFilter, setExamFilter] = useState('All');
 
-  const filteredResults = resultsData.filter(
+  // 
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const res = await axios.get('/api/teacher/results');
+        setResults(res.data);
+      } catch (error) {
+        console.error('Fetch Error:', error);
+        toast.error('Failed to load results');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchResults();
+  }, []);
+
+  // 
+  const filteredResults = results.filter(
     r =>
-      (examFilter === 'All' || r.exam === examFilter) &&
-      r.student.toLowerCase().includes(search.toLowerCase()),
+      (examFilter === 'All' || r.examName === examFilter) &&
+      (r.studentName?.toLowerCase().includes(search.toLowerCase()) ||
+        r.studentEmail?.toLowerCase().includes(search.toLowerCase())),
   );
 
-  const total = resultsData.length;
-  const pass = resultsData.filter(r => r.status === 'Pass').length;
-  const fail = resultsData.filter(r => r.status === 'Fail').length;
-  const average = Math.round(
-    resultsData.reduce((acc, r) => acc + r.marks, 0) / total,
-  );
+  //
+  const total = results.length;
+  const pass = results.filter(r => r.status === 'Pass').length;
+  const fail = results.filter(r => r.status === 'Fail').length;
+  const average =
+    total > 0
+      ? Math.round(results.reduce((acc, r) => acc + (r.marks || 0), 0) / total)
+      : 0;
 
   const stats = [
     {
@@ -121,7 +63,7 @@ export default function ResultsPage() {
       color: 'text-blue-600 bg-blue-50',
     },
     {
-      label: 'Success Rate',
+      label: 'Passed Students',
       value: pass,
       icon: <FaCheckCircle />,
       color: 'text-emerald-600 bg-emerald-50',
@@ -140,11 +82,22 @@ export default function ResultsPage() {
     },
   ];
 
-  const uniqueExams = ['All', ...new Set(resultsData.map(r => r.exam))];
+  const uniqueExams = ['All', ...new Set(results.map(r => r.examName))];
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <FaSpinner className="animate-spin text-primary text-4xl" />
+        <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
+          Calculating Results...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-10 p-4 lg:p-0">
-      {/* ================= HEADER ================= */}
+      {/* HEADER */}
       <div className="relative overflow-hidden p-8 md:p-10 rounded-[3rem] bg-white border border-slate-100 shadow-xl transition-all">
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary/5 blur-[100px] rounded-full"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -156,14 +109,17 @@ export default function ResultsPage() {
               Results & <span className="text-primary">Grading</span>
             </h1>
           </div>
-          <button className="bg-primary text-secondary h-14 rounded-2xl px-8 font-bold shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95 group">
+          <button
+            onClick={() => window.print()}
+            className="bg-primary text-white h-14 rounded-2xl px-8 font-bold shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95 group"
+          >
             <FaDownload className="group-hover:translate-y-0.5 transition-transform" />
             <span>Export Report</span>
           </button>
         </div>
       </div>
 
-      {/* ================= STATS GRID ================= */}
+      {/* STATS GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
           <div
@@ -187,13 +143,13 @@ export default function ResultsPage() {
         ))}
       </div>
 
-      {/* ================= FILTERS ================= */}
+      {/* FILTERS */}
       <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search student results..."
+            placeholder="Search by student name or email..."
             className="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 text-sm font-medium transition-all"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -216,7 +172,7 @@ export default function ResultsPage() {
         </div>
       </div>
 
-      {/* ================= RESULTS TABLE ================= */}
+      {/* RESULTS TABLE */}
       <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -245,7 +201,7 @@ export default function ResultsPage() {
             <tbody className="divide-y divide-slate-50">
               {filteredResults.map((r, index) => (
                 <tr
-                  key={r.id}
+                  key={r._id}
                   className="group hover:bg-slate-50/50 transition-colors"
                 >
                   <td className="px-8 py-6 text-sm font-black text-slate-300 text-center">
@@ -253,15 +209,15 @@ export default function ResultsPage() {
                   </td>
                   <td className="px-6 py-6">
                     <p className="text-sm font-bold text-slate-700 leading-tight">
-                      {r.student}
+                      {r.studentName}
                     </p>
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                      ID: #{r.id}00{r.id}
+                      {r.studentEmail}
                     </span>
                   </td>
                   <td className="px-6 py-6">
                     <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest">
-                      {r.exam}
+                      {r.examName}
                     </span>
                   </td>
                   <td className="px-6 py-6">
@@ -271,11 +227,11 @@ export default function ResultsPage() {
                       </span>
                       <span
                         className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black ${
-                          r.grade.includes('A')
+                          r.grade === 'A+' || r.grade === 'A'
                             ? 'bg-emerald-100 text-emerald-600'
-                            : r.grade === 'B'
-                              ? 'bg-blue-100 text-blue-600'
-                              : 'bg-rose-100 text-rose-600'
+                            : r.grade === 'F'
+                              ? 'bg-rose-100 text-rose-600'
+                              : 'bg-blue-100 text-blue-600'
                         }`}
                       >
                         {r.grade}
@@ -296,11 +252,10 @@ export default function ResultsPage() {
                       {r.status}
                     </span>
                   </td>
-                  {/* Table Body */}
                   <td className="px-8 py-6">
                     <div className="flex justify-center">
                       <Link
-                        href={`/dashboard/teacher/script-check`}
+                        href={`/dashboard/teacher/results/review/${r._id}`}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
                       >
                         <FaPenNib size={12} />
@@ -313,15 +268,6 @@ export default function ResultsPage() {
             </tbody>
           </table>
         </div>
-
-        {filteredResults.length === 0 && (
-          <div className="py-20 text-center space-y-3">
-            <div className="text-4xl">📊</div>
-            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
-              No matching results found
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

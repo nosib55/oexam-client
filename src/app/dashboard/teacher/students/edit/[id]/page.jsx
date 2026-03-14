@@ -1,26 +1,28 @@
 'use client';
-
-import React, { useState, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import {
   FaArrowLeft,
   FaUserCircle,
+  FaSave,
+  FaSpinner,
+  FaCloudUploadAlt,
   FaEnvelope,
   FaPhone,
   FaSchool,
   FaMapMarkerAlt,
-  FaSave,
-  FaCloudUploadAlt,
-  FaSpinner,
 } from 'react-icons/fa';
+import Link from 'next/link';
 
-const AddNewStudent = () => {
+const EditStudent = () => {
   const router = useRouter();
+  const { id } = useParams();
   const fileInputRef = useRef(null);
+
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -31,26 +33,37 @@ const AddNewStudent = () => {
     className: 'Class 10',
     gender: 'Male',
     address: '',
-    profilePicture: '', // will store the hosted image URL
+    profilePicture: '',
   });
 
-  // Handle text input changes
+  // Fetch student data on load
+  useEffect(() => {
+    const fetchStudent = async () => {
+      try {
+        const res = await axios.get(`/api/teacher/students/${id}`);
+        if (res.data) {
+          setFormData(res.data);
+          setPreviewUrl(res.data.profilePicture);
+        }
+      } catch (error) {
+        toast.error('Failed to load student data');
+        router.push('/dashboard/teacher/students');
+      } finally {
+        setFetching(false);
+      }
+    };
+    fetchStudent();
+  }, [id, router]);
+
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle Image Upload to Cloudinary
   const handleImageUpload = async e => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Client side validation
-    if (file.size > 5 * 1024 * 1024) {
-      return toast.error('File size must be less than 5MB');
-    }
-
-    // Set local preview
     setPreviewUrl(URL.createObjectURL(file));
     setUploading(true);
 
@@ -59,8 +72,7 @@ const AddNewStudent = () => {
     data.append(
       'upload_preset',
       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-    ); 
-    data.append('cloud_name', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME);
+    );
 
     try {
       const res = await axios.post(
@@ -68,96 +80,76 @@ const AddNewStudent = () => {
         data,
       );
       setFormData(prev => ({ ...prev, profilePicture: res.data.secure_url }));
-      toast.success('Photo uploaded successfully!');
-    } catch (error) {
-      console.error('Upload Error:', error);
-      toast.error('Failed to upload image');
+      toast.success('Image uploaded!');
+    } catch (err) {
+      toast.error('Upload failed');
     } finally {
       setUploading(false);
     }
   };
 
-  // Form Submit Handler
   const handleSubmit = async e => {
     e.preventDefault();
-    if (uploading)
-      return toast.error('Please wait for the photo to finish uploading');
-
     setLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const payload = { ...formData, teacherId: user?._id };
-
-      const res = await axios.post('/api/teacher/students', payload);
-
-      if (res.status === 201) {
-        toast.success('Student Enrolled Successfully!');
-        router.push('/dashboard/teacher/students');
-      }
+      await axios.put(`/api/teacher/students/${id}`, formData);
+      toast.success('Student updated successfully!');
+      router.push('/dashboard/teacher/students');
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Something went wrong');
+      toast.error('Update failed');
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching)
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <FaSpinner className="animate-spin text-primary text-4xl" />
+        <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
+          Loading Student Data...
+        </p>
+      </div>
+    );
+
   return (
     <div className="max-w-5xl mx-auto pb-20 p-4 lg:p-0">
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-10">
-        <div className="flex items-center gap-5">
-          <Link
-            href="/dashboard/teacher/students"
-            className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-primary transition-all"
-          >
-            <FaArrowLeft />
-          </Link>
-          <div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight">
-              Add New Student
-            </h1>
-            <p className="text-[10px] font-black text-primary uppercase tracking-widest italic">
-              Student Enrollment Portal
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={handleSubmit}
-          disabled={loading || uploading}
-          className="hidden md:flex bg-primary text-white h-14 rounded-2xl px-8 font-bold shadow-lg transition-all items-center gap-2 active:scale-95 disabled:opacity-50"
+      <div className="flex items-center gap-5 mb-10">
+        <Link
+          href="/dashboard/teacher/students"
+          className="w-12 h-12 bg-white border border-slate-100 flex items-center justify-center rounded-2xl text-slate-400 hover:text-primary shadow-sm transition-all"
         >
-          {loading ? (
-            <FaSpinner className="animate-spin" />
-          ) : (
-            <FaSave size={18} />
-          )}
-          <span>{loading ? 'Processing...' : 'Enroll Student'}</span>
-        </button>
+          <FaArrowLeft />
+        </Link>
+        <div>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight">
+            Edit Student
+          </h1>
+          <p className="text-[10px] font-black text-primary uppercase tracking-widest italic">
+            Update Student Information
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT SIDE: AVATAR UPLOAD */}
+        {/* AVATAR SECTION */}
         <div className="space-y-6">
           <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col items-center text-center">
             <div
               onClick={() => fileInputRef.current.click()}
               className="relative group cursor-pointer"
             >
-              <div className="w-40 h-40 rounded-[2.5rem] bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300 group-hover:border-primary group-hover:bg-primary/5 transition-all overflow-hidden">
+              <div className="w-40 h-40 rounded-[2.5rem] bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300 group-hover:border-primary transition-all overflow-hidden">
                 {previewUrl ? (
                   <img
                     src={previewUrl}
-                    alt="Preview"
                     className="w-full h-full object-cover"
+                    alt="Preview"
                   />
                 ) : (
-                  <FaUserCircle
-                    size={80}
-                    className="group-hover:scale-110 transition-transform duration-500"
-                  />
+                  <FaUserCircle size={80} />
                 )}
-
                 {uploading && (
                   <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                     <FaSpinner
@@ -178,16 +170,13 @@ const AddNewStudent = () => {
               className="hidden"
               accept="image/*"
             />
-            <div className="mt-6">
-              <h3 className="font-bold text-slate-700">Student Photo</h3>
-              <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">
-                PNG, JPG up to 5MB
-              </p>
-            </div>
+            <p className="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              Update Photo
+            </p>
           </div>
         </div>
 
-        {/* RIGHT SIDE: FORM FIELDS */}
+        {/* FORM SECTION */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-8 md:p-10 rounded-[3rem] border border-slate-100 shadow-sm space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -204,7 +193,6 @@ const AddNewStudent = () => {
                     onChange={handleChange}
                     type="text"
                     required
-                    placeholder="e.g. Ayesha Rahman"
                     className="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 text-sm transition-all"
                   />
                 </div>
@@ -223,7 +211,6 @@ const AddNewStudent = () => {
                     onChange={handleChange}
                     type="email"
                     required
-                    placeholder="student@example.com"
                     className="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 text-sm transition-all"
                   />
                 </div>
@@ -242,7 +229,6 @@ const AddNewStudent = () => {
                     onChange={handleChange}
                     type="tel"
                     required
-                    placeholder="+880 1XXX XXXXXX"
                     className="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 text-sm transition-all"
                   />
                 </div>
@@ -274,7 +260,7 @@ const AddNewStudent = () => {
               </div>
             </div>
 
-            {/* Gender Switcher */}
+            {/* Gender Selection */}
             <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
                 Gender
@@ -308,23 +294,25 @@ const AddNewStudent = () => {
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Enter full address here..."
                   className="w-full pl-11 pr-4 py-4 rounded-3xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 text-sm min-h-[120px] transition-all"
                 />
               </div>
             </div>
 
+            {/* Submit Button */}
             <button
               onClick={handleSubmit}
               disabled={loading || uploading}
-              className="md:hidden w-full bg-primary text-white h-16 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-95"
+              className="w-full bg-primary text-white h-16 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
             >
               {loading ? (
-                <FaSpinner className="animate-spin" />
+                <FaSpinner className="animate-spin" size={18} />
               ) : (
                 <FaSave size={18} />
               )}
-              <span>{loading ? 'Processing...' : 'Enroll Student'}</span>
+              <span>
+                {loading ? 'Saving Changes...' : 'Update Student Info'}
+              </span>
             </button>
           </div>
         </div>
@@ -333,4 +321,4 @@ const AddNewStudent = () => {
   );
 };
 
-export default AddNewStudent;
+export default EditStudent;
