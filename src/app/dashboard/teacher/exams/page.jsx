@@ -1,5 +1,4 @@
 'use client';
-
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -12,7 +11,6 @@ import {
   FaTrash,
   FaPlus,
   FaCalendarAlt,
-  FaClock,
   FaFileAlt,
   FaFilter,
   FaSpinner,
@@ -21,7 +19,7 @@ import {
 
 export default function ExamsPage() {
   const [examsData, setExamsData] = useState([]);
-  const [allQuestions, setAllQuestions] = useState([]); // নতুন স্টেট সব প্রশ্নের জন্য
+  const [allQuestions, setAllQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('');
@@ -35,7 +33,7 @@ export default function ExamsPage() {
       if (storedUser) {
         const userId = storedUser._id || storedUser.id;
 
-        // এক্সাম এবং কোয়েশ্চেন দুটি আলাদা API থেকে কল করা হচ্ছে
+        // 
         const [examsRes, questionsRes] = await Promise.all([
           axios.get(`/api/teacher/exams?userId=${userId}`),
           axios.get(`/api/teacher/questions?userId=${userId}`),
@@ -52,11 +50,12 @@ export default function ExamsPage() {
     }
   };
 
+
   useEffect(() => {
     fetchData();
   }, []);
 
-  // সাবজেক্ট অনুযায়ী প্রশ্ন সংখ্যা বের করার লজিক
+  //
   const getQuestionCountBySubject = (questions, subjectName) => {
     if (!questions || !subjectName) return 0;
     const filtered = questions.filter(
@@ -142,7 +141,7 @@ export default function ExamsPage() {
     },
     {
       label: 'Questions Set',
-      value: allQuestions.length, // এটি এখন পুরো কোয়েশ্চেন ব্যাংকের সংখ্যা দেখাবে
+      value: allQuestions.length,
       icon: <FaLayerGroup />,
       color: 'text-indigo-600 bg-indigo-50',
     },
@@ -295,7 +294,6 @@ export default function ExamsPage() {
                   <td className="px-6 py-6 bg-slate-50/30 group-hover:bg-white border-y border-transparent group-hover:border-slate-100 transition-all">
                     <div className="flex flex-col">
                       <span className="text-xs font-black text-slate-700">
-                        {/* সাবজেক্ট অনুযায়ী অটোমেটিক প্রশ্নের সংখ্যা এখানে বসছে */}
                         {getQuestionCountBySubject(allQuestions, exam.subject)}{' '}
                         Items
                       </span>

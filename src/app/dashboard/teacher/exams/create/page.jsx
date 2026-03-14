@@ -8,6 +8,7 @@ import {
   LuBookOpen,
   LuTimer,
   LuCalculator,
+  LuListChecks,
 } from 'react-icons/lu';
 import Swal from 'sweetalert2';
 import axios from 'axios';
@@ -28,7 +29,7 @@ const NewExamSetup = () => {
     shuffleQuestions: false,
   });
 
-  // auto mark calculation logic
+  // each questions mark 
   const markPerQuestion =
     questionsCount > 0
       ? (Number(formData.totalMarks) / questionsCount).toFixed(2)
@@ -94,7 +95,7 @@ const NewExamSetup = () => {
         Swal.fire({
           icon: 'success',
           title: 'Exam Configured!',
-          text: 'Settings saved. Redirecting to question setup...',
+          text: 'Settings saved. Redirecting to preview...',
           timer: 2000,
           showConfirmButton: false,
         });
@@ -111,7 +112,7 @@ const NewExamSetup = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 my-16 px-4">
-      {/* Header Section */}
+      {/* Header */}
       <div className="text-center space-y-3">
         <div className="inline-flex p-3 bg-primary/10 rounded-2xl text-primary mb-2">
           <LuSettings2 size={28} />
@@ -124,10 +125,10 @@ const NewExamSetup = () => {
         </p>
       </div>
 
-      <div className="bg-white p-6 md:p-12 rounded-[3rem] border border-slate-200/60 shadow-2xl shadow-slate-200/50 space-y-10">
-        {/* Dynamic Marking Indicator Widget */}
+      <div className="bg-white p-6 md:p-12 rounded-[3rem] border border-slate-200/60 shadow-2xl space-y-10">
+        {/*  */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col items-center justify-center text-center">
+          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col items-center text-center">
             <LuTarget className="text-slate-400 mb-2" />
             <span className="text-[10px] font-black text-slate-400 uppercase">
               Total Weight
@@ -136,7 +137,7 @@ const NewExamSetup = () => {
               {formData.totalMarks}
             </p>
           </div>
-          <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center justify-center text-center ring-2 ring-primary/5">
+          <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center text-center ring-2 ring-primary/5">
             <LuCalculator className="text-primary mb-2" />
             <span className="text-[10px] font-black text-primary uppercase">
               Mark Per Question
@@ -145,7 +146,7 @@ const NewExamSetup = () => {
               {markPerQuestion}
             </p>
           </div>
-          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col items-center justify-center text-center">
+          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col items-center text-center">
             <LuBookOpen className="text-slate-400 mb-2" />
             <span className="text-[10px] font-black text-slate-400 uppercase">
               Bank Questions
@@ -157,7 +158,6 @@ const NewExamSetup = () => {
         </div>
 
         <div className="space-y-6">
-          {/* Exam Title */}
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
               Exam Title
@@ -173,7 +173,6 @@ const NewExamSetup = () => {
             />
           </div>
 
-          {/* Date & Time Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
@@ -201,7 +200,6 @@ const NewExamSetup = () => {
             </div>
           </div>
 
-          {/* Subject & Marks Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
@@ -228,12 +226,10 @@ const NewExamSetup = () => {
                   setFormData({ ...formData, totalMarks: e.target.value })
                 }
                 className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all"
-                placeholder="100"
               />
             </div>
           </div>
 
-          {/* Duration */}
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
               <LuTimer size={12} className="text-primary" /> Duration (Minutes)
@@ -245,17 +241,44 @@ const NewExamSetup = () => {
                 setFormData({ ...formData, duration: e.target.value })
               }
               className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all"
-              placeholder="e.g. 60"
             />
           </div>
 
-          {/* Advanced Rules Section */}
+          {/* ৪. প্রতি প্রশ্নের মার্ক প্রিভিউ সেকশন */}
           <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-5">
             <div className="flex items-center gap-3 text-slate-800 font-black text-xs uppercase tracking-widest border-b border-slate-200 pb-4">
-              <LuSettings2 className="text-primary" /> Advanced Examination
-              Rules
+              <LuListChecks className="text-primary" /> Mark Distribution
+              Preview
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+
+            <div className="space-y-3">
+              {questionsCount > 0 ? (
+                <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-slate-400 uppercase">
+                      Calculation
+                    </span>
+                    <span className="text-sm font-bold text-slate-700">
+                      {formData.totalMarks} Marks ÷ {questionsCount} Questions
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-bold text-slate-400 uppercase">
+                      Per Question
+                    </span>
+                    <p className="text-lg font-black text-primary">
+                      {markPerQuestion} pt
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs font-bold text-slate-400 italic text-center py-2">
+                  Enter a subject to see mark distribution...
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <label className="flex-1 flex items-center justify-between bg-white px-6 py-4 rounded-2xl border border-slate-200 font-bold text-sm text-slate-600 shadow-sm hover:border-primary/30 transition-all cursor-pointer">
                 <span>Negative Marking</span>
                 <input
