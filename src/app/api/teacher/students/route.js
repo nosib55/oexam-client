@@ -22,3 +22,14 @@ export async function POST(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function GET(req) {
+  try {
+    await connectDB();
+    // Fetch all students and sort by newest first
+    const students = await Student.find().sort({ createdAt: -1 });
+    return NextResponse.json(students, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
