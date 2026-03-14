@@ -13,6 +13,11 @@ const StudentSchema = new mongoose.Schema({
     type: String,
     default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
   },
+  status: {
+    type: String,
+    enum: ['active', 'pending', 'inactive'], 
+    default: 'pending',
+  },
 });
 
 export default mongoose.models.Student ||
