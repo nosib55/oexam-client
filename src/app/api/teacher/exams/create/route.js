@@ -6,17 +6,41 @@ export async function POST(req) {
   try {
     await connectDB();
     const body = await req.json();
-    const combinedDateTime = new Date(`${body.examDate}T${body.examTime}`);
+    const { 
+      examName, 
+      subject, 
+      duration, 
+      totalMarks, 
+      userId, 
+      examDate, 
+      examTime, 
+      questionBankId,
+      classId
+    } = body;
+
+    const combinedDateTime = new Date(`${examDate}T${examTime}`);
+
+    // If a question bank is selected, fetch its questions
+    let questions = [];
+    if (questionBankId) {
+      const QuestionBank = (await import('@/models/QuestionBank')).default;
+      const bank = await QuestionBank.findById(questionBankId);
+      if (bank) {
+        questions = bank.questions || [];
+      }
+    }
 
     const examData = {
-      title: body.examName,
-      subject: body.subject.trim(),
-      duration: Number(body.duration),
-      totalMarks: Number(body.totalMarks) || 100,
-      createdBy: body.userId,
+      title: examName,
+      subject: subject.trim(),
+      duration: Number(duration),
+      totalMarks: Number(totalMarks) || 100,
+      createdBy: userId,
       scheduledAt: combinedDateTime,
       status: 'draft',
-      questions: [],
+      questionBankId: questionBankId || null,
+      classId: classId || null,
+      questions: questions,
     };
 
     const newExam = await Exam.create(examData);

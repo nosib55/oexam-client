@@ -9,6 +9,14 @@ const ExamSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    questionBankId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'QuestionBank',
+    },
+    classId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Class',
+    },
     subject: {
       type: String,
       required: true,

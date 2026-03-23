@@ -56,7 +56,7 @@ const ExamPreview = ({ params: paramsPromise }) => {
       }
 
       const res = await axios.get(
-        `/api/teacher/questions?userId=${userId}&subject=${selectedSubject || ''}`,
+        `/api/teacher/question-bank?userId=${userId}&subject=${selectedSubject || ''}`,
       );
       setMyQuestions(res.data);
     } catch (err) {

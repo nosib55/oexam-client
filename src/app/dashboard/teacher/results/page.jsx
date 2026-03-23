@@ -26,7 +26,9 @@ export default function ResultsPage() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const res = await axios.get('/api/teacher/results');
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user?._id || user?.id;
+        const res = await axios.get(`/api/teacher/results?userId=${userId}`);
         setResults(res.data);
       } catch (error) {
         console.error('Fetch Error:', error);

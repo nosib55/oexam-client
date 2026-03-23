@@ -36,7 +36,7 @@ export default function ExamsPage() {
         // 
         const [examsRes, questionsRes] = await Promise.all([
           axios.get(`/api/teacher/exams?userId=${userId}`),
-          axios.get(`/api/teacher/questions?userId=${userId}`),
+          axios.get(`/api/teacher/question-bank?userId=${userId}`),
         ]);
 
         setExamsData(examsRes.data);

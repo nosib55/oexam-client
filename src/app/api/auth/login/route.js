@@ -104,11 +104,16 @@ export async function POST(req) {
       message: "Login successful",
       token,
       user: {
+        _id: user._id,
         id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
-        class: user.userClass,
+        institution: user.institution,
+        userClass: user.userClass,
+        image: user.image || null,
+        location: user.location || null,
+        isVerified: user.isVerified,
       },
     });
 

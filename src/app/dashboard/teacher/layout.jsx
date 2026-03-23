@@ -1,7 +1,8 @@
 'use client';
 import Logo from '@/components/shared/Logo/Logo';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import axios from 'axios';
 import {
   LuDatabase,
   LuPlus,
@@ -10,10 +11,25 @@ import {
   LuSettings,
   LuLayoutDashboard,
   LuChevronRight,
+  LuSchool,
+  LuBell,
+  LuLogOut,
 } from 'react-icons/lu';
 
 export default function TeacherLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('/api/auth/logout');
+      localStorage.clear();
+      router.push('/auth/login');
+    } catch (err) {
+      localStorage.clear();
+      router.push('/auth/login');
+    }
+  };
 
   const menuItems = [
     {
@@ -22,9 +38,19 @@ export default function TeacherLayout({ children }) {
       href: '/dashboard/teacher',
     },
     {
-      name: 'Questions',
+      name: 'Classes',
+      icon: <LuSchool size={20} />,
+      href: '/dashboard/teacher/classes',
+    },
+    {
+      name: 'Join Requests',
+      icon: <LuBell size={20} />,
+      href: '/dashboard/teacher/classes/requests',
+    },
+    {
+      name: 'Question Banks',
       icon: <LuDatabase size={20} />,
-      href: '/dashboard/teacher/questions',
+      href: '/dashboard/teacher/question-bank',
     },
     {
       name: 'Exams',
@@ -49,7 +75,16 @@ export default function TeacherLayout({ children }) {
   ];
 
   return (
-    <div className="flex min-h-screen transition-colors duration-300">
+    <div className="flex min-h-screen transition-colors duration-300 bg-slate-50">
+
+      {/* MOBILE TOP BAR */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-16 flex items-center justify-between px-6 shadow-sm">
+        <Logo />
+        <button onClick={handleLogout} className="p-2.5 rounded-xl bg-red-50 text-red-500 border border-red-100 active:scale-90 transition-all">
+          <LuLogOut size={20} />
+        </button>
+      </div>
+
       {/* ================= DESKTOP SIDEBAR (Lg screens only) ================= */}
       <aside className="hidden lg:flex w-72 flex-col shadow sticky top-0 h-screen bg-white transition-all">
         <div className="p-8">
@@ -87,20 +122,30 @@ export default function TeacherLayout({ children }) {
           })}
         </nav>
 
-        <div className="p-5 border mx-4 mb-4 bg-slate-50 rounded-3xl transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary text-secondary flex items-center justify-center font-bold shadow-md">
-              TQ
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-xs font-bold text-slate-800 truncate">
-                Team-Examinerly
-              </p>
-              <p className="text-[10px] text-slate-500 truncate italic">
-                examinerly@edu.com
-              </p>
+        <div className="px-4 mb-4 space-y-2">
+          <div className="p-5 border bg-slate-50 rounded-3xl transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary text-secondary flex items-center justify-center font-bold shadow-md">
+                TQ
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-xs font-bold text-slate-800 truncate">
+                  Teacher Portal
+                </p>
+                <p className="text-[10px] text-slate-500 truncate italic">
+                  Manage your classes
+                </p>
+              </div>
             </div>
           </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center gap-3 w-full p-4 rounded-2xl bg-white border-2 border-red-50 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300 font-bold shadow-sm text-sm"
+          >
+            <LuLogOut size={20} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
 
@@ -137,8 +182,7 @@ export default function TeacherLayout({ children }) {
 
       {/* ================= MAIN CONTENT ================= */}
       <main className="flex-1 min-h-screen overflow-y-auto">
-        {/* Added padding bottom on mobile so content isn't hidden by the nav */}
-        <div className="p-4 md:p-8 lg:p-12 pb-24 lg:pb-12 max-w-7xl mx-auto">
+        <div className="pt-20 px-4 md:p-8 lg:p-12 pb-24 lg:pb-12 max-w-7xl mx-auto">
           {children}
         </div>
       </main>

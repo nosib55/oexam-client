@@ -9,6 +9,7 @@ import {
   LuTimer,
   LuCalculator,
   LuListChecks,
+  LuSchool,
 } from 'react-icons/lu';
 import Swal from 'sweetalert2';
 import axios from 'axios';
@@ -17,7 +18,11 @@ import { useRouter } from 'next/navigation';
 const NewExamSetup = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [questionBankId, setQuestionBankId] = useState('');
+  const [questionBanks, setQuestionBanks] = useState([]);
   const [questionsCount, setQuestionsCount] = useState(0);
+  const [classId, setClassId] = useState('');
+  const [classes, setClasses] = useState([]);
   const [formData, setFormData] = useState({
     examName: '',
     subject: '',
@@ -27,28 +32,66 @@ const NewExamSetup = () => {
     examTime: '',
     negativeMarking: false,
     shuffleQuestions: false,
+    manualMarking: false,
+    perQuestionMark: 1
   });
 
   // each questions mark 
-  const markPerQuestion =
-    questionsCount > 0
-      ? (Number(formData.totalMarks) / questionsCount).toFixed(2)
-      : 0;
+  const markPerQuestion = formData.manualMarking 
+    ? formData.perQuestionMark 
+    : (questionsCount > 0 ? (Number(formData.totalMarks) / questionsCount).toFixed(2) : 0);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) setUser(storedUser);
+    if (storedUser) {
+      setUser(storedUser);
+      const uid = storedUser?._id || storedUser?.id;
+      fetchQuestionBanks(uid);
+      fetchClasses(uid);
+    }
   }, []);
+
+  const fetchClasses = async (userId) => {
+    try {
+      const res = await axios.get(`/api/teacher/classes?userId=${userId}`);
+      setClasses(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch classes:', err);
+    }
+  };
+
+  const fetchQuestionBanks = async (userId) => {
+    try {
+      const res = await axios.get(`/api/teacher/question-bank/list?userId=${userId}`);
+      setQuestionBanks(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch question banks:', err);
+    }
+  };
 
   // 
   useEffect(() => {
     const fetchQuestionCount = async () => {
-      if (formData.subject && user) {
+      // If we have a bank selected, get its count. Otherwise try by subject (fallback)
+      if (user) {
         try {
-          const res = await axios.get(
-            `/api/teacher/questions/count?subject=${formData.subject}&userId=${user._id || user.id}`,
-          );
-          setQuestionsCount(res.data.count || 0);
+          let url = '';
+          if (questionBankId) {
+            // Updated count API logic might be needed if count only filters by subject
+            // For now, if bank is selected, we might want to fetch that specific bank's count
+            const selectedBank = questionBanks.find(b => b._id === questionBankId);
+            if (selectedBank) {
+              setQuestionsCount(selectedBank.questions?.length || 0);
+              return;
+            }
+          }
+
+          if (formData.subject) {
+            const res = await axios.get(
+              `/api/teacher/question-bank/count?subject=${formData.subject}&userId=${user._id || user.id}`,
+            );
+            setQuestionsCount(res.data.count || 0);
+          }
         } catch (err) {
           console.error(
             'Count fetch failed:',
@@ -58,7 +101,7 @@ const NewExamSetup = () => {
       }
     };
     fetchQuestionCount();
-  }, [formData.subject, user]);
+  }, [formData.subject, questionBankId, user, questionBanks]);
 
   const handleSubmit = async () => {
     const { examName, duration, totalMarks, examDate, examTime, subject } =
@@ -70,14 +113,19 @@ const NewExamSetup = () => {
       !totalMarks ||
       !examDate ||
       !examTime ||
-      !subject
+      !classId ||
+      (!subject && !questionBankId)
     ) {
       return Swal.fire(
         'Missing Info',
-        'Please fill all required fields to proceed.',
+        'Please fill all required fields including the class.',
         'warning',
       );
     }
+
+    const finalTotalMarks = formData.manualMarking 
+      ? (formData.perQuestionMark * questionsCount) 
+      : formData.totalMarks;
 
     try {
       Swal.fire({
@@ -87,6 +135,9 @@ const NewExamSetup = () => {
 
       const res = await axios.post('/api/teacher/exams/create', {
         ...formData,
+        totalMarks: finalTotalMarks,
+        questionBankId,
+        classId,
         markPerQuestion, 
         userId: user?._id || user?.id,
       });
@@ -173,6 +224,27 @@ const NewExamSetup = () => {
             />
           </div>
 
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
+              <LuSchool size={12} className="text-primary" /> Assign to Class
+            </label>
+            <select
+              value={classId}
+              onChange={e => setClassId(e.target.value)}
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+            >
+              <option value="">Select a class...</option>
+              {classes.length === 0 && (
+                <option disabled>No classes found — create one first</option>
+              )}
+              {classes.map(cls => (
+                <option key={cls._id} value={cls._id}>
+                  {cls.level} — {cls.institution}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
@@ -203,6 +275,30 @@ const NewExamSetup = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                Select Question Bank
+              </label>
+              <select
+                value={questionBankId}
+                onChange={e => {
+                  const bankId = e.target.value;
+                  setQuestionBankId(bankId);
+                  const selectedBank = questionBanks.find(b => b._id === bankId);
+                  if (selectedBank) {
+                    setFormData({ ...formData, subject: selectedBank.subject });
+                  }
+                }}
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all"
+              >
+                <option value="">Choose a bank...</option>
+                {questionBanks.map(bank => (
+                  <option key={bank._id} value={bank._id}>
+                    {bank.name} ({bank.subject})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
                 Subject Area
               </label>
               <input
@@ -215,6 +311,9 @@ const NewExamSetup = () => {
                 className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
                 Total Exam Marks
@@ -228,20 +327,19 @@ const NewExamSetup = () => {
                 className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all"
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
-              <LuTimer size={12} className="text-primary" /> Duration (Minutes)
-            </label>
-            <input
-              type="number"
-              value={formData.duration}
-              onChange={e =>
-                setFormData({ ...formData, duration: e.target.value })
-              }
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all"
-            />
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-1">
+                <LuTimer size={12} className="text-primary" /> Duration (Minutes)
+              </label>
+              <input
+                type="number"
+                value={formData.duration}
+                onChange={e =>
+                  setFormData({ ...formData, duration: e.target.value })
+                }
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-700 transition-all"
+              />
+            </div>
           </div>
 
           {/* ৪. প্রতি প্রশ্নের মার্ক প্রিভিউ সেকশন */}
@@ -273,7 +371,7 @@ const NewExamSetup = () => {
                 </div>
               ) : (
                 <p className="text-xs font-bold text-slate-400 italic text-center py-2">
-                  Enter a subject to see mark distribution...
+                  Select a question bank to see mark distribution...
                 </p>
               )}
             </div>
@@ -308,6 +406,43 @@ const NewExamSetup = () => {
                 />
               </label>
             </div>
+
+            <div className="pt-4 border-t border-slate-100">
+               <label className="flex items-center justify-between bg-indigo-50/50 px-6 py-4 rounded-2xl border border-indigo-100 font-bold text-sm text-indigo-900 shadow-sm hover:border-indigo-300 transition-all cursor-pointer">
+                <div className="flex flex-col">
+                  <span>Manual Mark Allocation</span>
+                  <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-0.5">Define fixed marks for every item</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.manualMarking}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      manualMarking: e.target.checked,
+                    })
+                  }
+                  className="checkbox checkbox-indigo rounded-lg"
+                />
+              </label>
+
+              {formData.manualMarking && (
+                <div className="mt-4 p-6 bg-white rounded-2xl border border-indigo-100 shadow-xl shadow-indigo-500/5 animate-in fade-in slide-in-from-top-2">
+                  <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-3">Custom Marks Per Item</label>
+                  <div className="flex items-center gap-4">
+                     <input 
+                      type="number"
+                      value={formData.perQuestionMark}
+                      onChange={(e) => setFormData({...formData, perQuestionMark: Number(e.target.value)})}
+                      className="w-full bg-slate-50 border-2 border-indigo-50 p-4 rounded-xl font-black text-indigo-600 outline-none focus:border-indigo-200 transition-all"
+                    />
+                    <div className="bg-indigo-600 text-white px-6 py-4 rounded-xl font-black text-sm whitespace-nowrap">
+                       Total: {(formData.perQuestionMark * questionsCount).toFixed(0)} Pts
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -319,6 +454,7 @@ const NewExamSetup = () => {
         </button>
       </div>
     </div>
+
   );
 };
 
