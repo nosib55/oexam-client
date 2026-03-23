@@ -1,5 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import QuestionBank from '@/models/QuestionBank';
+import Question from '@/models/Question';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 
@@ -10,6 +11,7 @@ export async function GET(req, { params }) {
   try {
     await connectDB();
     const { id } = await params;
+    console.log('Fetching QuestionBank with ID:', id);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
@@ -23,8 +25,8 @@ export async function GET(req, { params }) {
 
     return NextResponse.json(bank, { status: 200 });
   } catch (error) {
-    console.error('SERVER ERROR (GET Bank):', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('SERVER ERROR (GET Bank ID: ' + id + '):', error);
+    return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
 }
 
