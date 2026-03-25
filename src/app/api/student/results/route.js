@@ -10,16 +10,20 @@ export async function GET(req) {
   try {
     await dbConnect();
 
-    // Verify authentication
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
+    // Verify authentication (check header first, then cookies)
+    let token = req.headers.get('authorization')?.split(' ')[1];
+    
+    if (!token) {
+        token = req.cookies.get('token')?.value;
+    }
+
+    if (!token) {
       return NextResponse.json(
-        { message: 'No authorization header' },
+        { message: 'No session or authorization token found' },
         { status: 401 }
       );
     }
 
-    const token = authHeader.split(' ')[1];
     const { payload } = await jwtVerify(token, secret);
 
     // Get all results for the student

@@ -31,17 +31,21 @@ export async function POST(req) {
     const processedAnswers = exam.questions.map(q => {
       // Handle potential ID mismatch (client might send _id or id)
       const qId = q._id.toString();
-      const sAns = (studentAnswers[qId] || '').toString().trim();
-      const cAns = (q.correctAnswer || '').toString().trim();
+      const sAns = (studentAnswers[qId] ?? '').toString().trim();
+      const cAns = (q.correctAnswer ?? '').toString().trim();
 
       let marks = 0;
       let correct = false;
 
       // Grading logic based on question type
       if (q.type === 'MCQ' || q.type === 'True/False') {
+        console.log(`Checking Q[${qId}]: sAns="${sAns}", cAns="${cAns}"`);
         if (sAns.toLowerCase() === cAns.toLowerCase()) {
-          marks = q.marks || 1;
+          marks = q.marks || exam.markPerQuestion || 1;
           correct = true;
+          console.log(`  -> Match! Marks: ${marks}`);
+        } else {
+           console.log(`  -> NO MATCH.`);
         }
       } else if (q.type === 'Written') {
         // Simple keyword matching for written questions or leave for manual grading
@@ -68,7 +72,7 @@ export async function POST(req) {
       exam: new mongoose.Types.ObjectId(examId),
       answers: processedAnswers,
       marksObtained: Number(totalObtainedMarks.toFixed(2)), // For our new results API compatibility
-      totalMarks: Number(totalObtainedMarks.toFixed(2)),   // Fallback
+      totalMarks: exam.totalMarks || 0,   // Set to actual exam total possible marks
       isVerified: false,
     });
 

@@ -287,17 +287,17 @@ export default function ExamHall() {
                             {currentOptions.map((opt, i) => (
                                <button 
                                   key={i}
-                                  onClick={() => handleAnswerChange(currentQuestion._id, opt)}
+                                  onClick={() => handleAnswerChange(currentQuestion._id, i)}
                                   className={`p-6 rounded-3xl text-left font-bold transition-all border-2 flex items-center justify-between group ${
-                                     answers[currentQuestion._id] === opt 
+                                     answers[currentQuestion._id] === i 
                                      ? 'bg-primary/5 border-primary text-primary shadow-sm' 
                                      : 'bg-white border-slate-100 text-slate-600 hover:border-slate-200'
                                   }`}>
                                   <span>{opt}</span>
                                   <div className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center ${
-                                     answers[currentQuestion._id] === opt ? 'border-primary bg-primary text-white' : 'border-slate-200'
+                                     answers[currentQuestion._id] === i ? 'border-primary bg-primary text-white' : 'border-slate-200'
                                   }`}>
-                                     {answers[currentQuestion._id] === opt && <LuCircleCheck size={14} />}
+                                     {answers[currentQuestion._id] === i && <LuCircleCheck size={14} />}
                                   </div>
                                </button>
                             ))}

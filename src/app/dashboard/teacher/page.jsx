@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import axios from 'axios';
 import React from 'react';
 import {
   LuPlus,
@@ -18,32 +19,61 @@ import {
 } from 'react-icons/lu';
 
 export default function TeacherPage() {
-  const stats = [
+  const [data, setData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (storedUser) {
+        const userId = storedUser._id || storedUser.id;
+        const res = await axios.get(`/api/teacher/stats?userId=${userId}`);
+        setData(res.data);
+      }
+    } catch (error) {
+      console.error('Error fetching teacher stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dynamicStats = [
     {
       label: 'Active Exams',
-      value: '03',
+      value: data?.stats?.activeExams || '00',
       icon: <LuCircleArrowRight />,
       color: 'text-blue-600 bg-blue-50',
     },
     {
       label: 'Avg Pass Rate',
-      value: '84%',
+      value: data?.stats?.avgPassRate || '—',
       icon: <LuTrendingUp />,
       color: 'text-emerald-600 bg-emerald-50',
     },
     {
       label: 'Question Bank',
-      value: '128',
+      value: data?.stats?.questionBank || '00',
       icon: <LuFolder />,
       color: 'text-amber-600 bg-amber-50',
     },
     {
       label: 'Total Students',
-      value: '142',
+      value: data?.stats?.totalStudents || '00',
       icon: <LuUsers />,
       color: 'text-indigo-600 bg-indigo-50',
     },
   ];
+
+  if (loading) return (
+     <div className="h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-t-4 border-primary rounded-full animate-spin"></div>
+     </div>
+  );
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 md:space-y-8 pb-10 p-4 lg:p-6">
@@ -68,7 +98,7 @@ export default function TeacherPage() {
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Link
-              href="/dashboard/teacher/exams"
+              href="/dashboard/teacher/exams/new"
               className="flex-1 md:flex-none"
             >
               <button className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white h-12 md:h-14 rounded-xl md:rounded-2xl px-4 md:px-8 font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-95 group text-sm md:text-base">
@@ -82,6 +112,10 @@ export default function TeacherPage() {
 
             <button
               title="Logout"
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = '/auth/login';
+              }}
               className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl md:rounded-2xl bg-slate-50 text-slate-400 border border-slate-200 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all active:scale-95 shrink-0"
             >
               <LuLogOut size={20} />
@@ -92,7 +126,7 @@ export default function TeacherPage() {
 
       {/* ================= STATS GRID ================= */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {stats.map(stat => (
+        {dynamicStats.map(stat => (
           <div
             key={stat.label}
             className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group"
@@ -122,7 +156,7 @@ export default function TeacherPage() {
             Active Exam Control
           </h3>
           <Link
-            href={'/dashboard/teacher/exams/examlist'}
+            href={'/dashboard/teacher/exams'}
             className="text-[10px] md:text-xs font-bold text-primary hover:underline uppercase tracking-widest"
           >
             View All Exams
@@ -130,65 +164,39 @@ export default function TeacherPage() {
         </div>
 
         <div className="p-6 md:p-8 space-y-6">
-          {/* Exam Control Card */}
-          <div className="p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 bg-white hover:border-primary/20 transition-all shadow-sm">
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
-              <div className="space-y-3 w-full xl:w-2/3">
-                <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase">
-                  Status: Running
-                </span>
-                <h4 className="text-xl md:text-2xl font-black text-slate-800 leading-tight">
-                  Advanced Mathematics - Midterm 2024
-                </h4>
-                <p className="text-xs md:text-sm text-slate-500 font-medium">
-                  Started at 10:00 AM • 45 Students active
-                </p>
-              </div>
+          {data?.runningExam ? (
+             <div className="p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 bg-white hover:border-primary/20 transition-all shadow-sm">
+             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+               <div className="space-y-3 w-full xl:w-2/3">
+                 <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase">
+                   Status: Running
+                 </span>
+                 <h4 className="text-xl md:text-2xl font-black text-slate-800 leading-tight">
+                   {data.runningExam.title}
+                 </h4>
+                 <p className="text-xs md:text-sm text-slate-500 font-medium italic">
+                   Currently ongoing assessment hall
+                 </p>
+               </div>
 
-              <div className="flex flex-wrap gap-2 w-full xl:w-auto">
-                <button className="flex-1 xl:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-xl font-bold text-sm hover:bg-red-600 hover:text-white transition-all">
-                  <LuSquare size={16} />{' '}
-                  <span className="whitespace-nowrap">Stop Exam</span>
-                </button>
-                <button className="p-3.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-primary hover:text-white transition-all">
-                  <LuSettings size={20} />
-                </button>
-              </div>
+               <div className="flex flex-wrap gap-2 w-full xl:w-auto">
+                 <Link href={`/dashboard/teacher/exams/monitor/${data.runningExam._id}`} className="flex-1 xl:flex-none">
+                    <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 shadow-xl shadow-slate-200">
+                      Monitor Live
+                    </button>
+                 </Link>
+               </div>
+             </div>
+           </div>
+          ) : (
+            <div className="p-12 text-center rounded-[2rem] bg-slate-50 border border-dashed border-slate-200">
+               <LuCalendar size={48} className="mx-auto text-slate-200 mb-4" />
+               <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No exams currently running</p>
+               <Link href="/dashboard/teacher/exams/new">
+                 <button className="mt-4 text-xs font-black text-primary uppercase hover:underline">Start an Assessment</button>
+               </Link>
             </div>
-
-            {/* Progress Bar */}
-            <div className="mt-8">
-              <div className="flex justify-between text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">
-                <span>Time Remaining: 45m</span>
-                <span>Submission: 28/45</span>
-              </div>
-              <div className="h-2.5 md:h-3 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[65%] rounded-full shadow-lg shadow-primary/20 transition-all duration-1000"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Scheduled Exam */}
-          <div className="p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 bg-slate-50/50">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-primary shrink-0">
-                  <LuCalendar size={20} />
-                </div>
-                <div>
-                  <h5 className="font-bold text-slate-800 text-sm md:text-base">
-                    Physics Final Quiz
-                  </h5>
-                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-0.5">
-                    Oct 28 • 02:30 PM
-                  </p>
-                </div>
-              </div>
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-bold text-xs md:text-sm shadow-lg shadow-primary/10 hover:opacity-90 transition-all">
-                <LuPlay size={16} /> Publish Now
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -200,16 +208,12 @@ export default function TeacherPage() {
           <div className="flex items-center gap-3 mb-8">
             <LuTrophy className="text-amber-400" size={22} />
             <h3 className="font-black text-lg text-slate-800 tracking-tight">
-              Live Leaderboard
+              Top Student Performers
             </h3>
           </div>
 
           <div className="space-y-5 md:space-y-6">
-            {[
-              { name: 'Sabbir Ahmed', mark: '98', rank: '01' },
-              { name: 'Nusrat Jahan', mark: '95', rank: '02' },
-              { name: 'Arif Rayhan', mark: '92', rank: '03' },
-            ].map((student, i) => (
+            {data?.leaderboard && data.leaderboard.length > 0 ? data.leaderboard.map((student, i) => (
               <div
                 key={i}
                 className="flex justify-between items-center group cursor-pointer hover:translate-x-1 transition-transform"
@@ -226,10 +230,14 @@ export default function TeacherPage() {
                   {student.mark}%
                 </span>
               </div>
-            ))}
-            <button className="w-full py-4 mt-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.98]">
-              View Full Results
-            </button>
+            )) : (
+              <p className="text-xs text-slate-300 text-center py-10">No scores recorded yet</p>
+            )}
+            <Link href="/dashboard/teacher/results" className="block">
+              <button className="w-full py-4 mt-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.98]">
+                View Full Results
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -241,16 +249,17 @@ export default function TeacherPage() {
               className="mb-4 group-hover:animate-bounce transition-all opacity-90"
             />
             <h4 className="text-xl md:text-2xl font-black leading-tight">
-              Exam Insight
+              Teacher Statistics
             </h4>
             <p className="text-sm text-white/80 font-medium mt-3 leading-relaxed max-w-xs">
-              Your &#39;Advanced Math&#39; exam shows a 15% improvement in
-              average score compared to last month.
+              Ensure all results are verified in the review center to keep student leaderboards up-to-date.
             </p>
           </div>
-          <button className="relative z-10 w-full py-4 mt-8 bg-white text-primary rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all">
-            Verify Results
-          </button>
+          <Link href="/dashboard/teacher/results">
+            <button className="relative z-10 w-full py-4 mt-8 bg-white text-primary rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all">
+              Verify Results
+            </button>
+          </Link>
           <div className="absolute bottom-0 right-0 -mb-10 -mr-10 w-40 h-40 bg-white/10 blur-[50px] rounded-full"></div>
         </div>
       </div>
@@ -263,42 +272,30 @@ export default function TeacherPage() {
           </div>
           <div>
             <h3 className="text-lg font-black text-slate-800 tracking-tight leading-none">
-              System Logs
+              Submission Activity
             </h3>
             <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
-              Real-time Notifications
+              Latest Result Events
             </p>
           </div>
         </div>
 
         <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-all group gap-2">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] shrink-0"></div>
-              <p className="text-xs md:text-sm font-bold text-slate-700">
-                New submission:{' '}
-                <span className="text-primary italic">Farhana Islam</span>{' '}
-                completed Math Midterm
-              </p>
-            </div>
-            <span className="text-[9px] font-black text-slate-400 sm:ml-auto">
-              2 MINUTES AGO
-            </span>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50/50 gap-2 opacity-80">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-amber-500 shrink-0"></div>
-              <p className="text-xs md:text-sm font-bold text-slate-700">
-                Exam Reminder:{' '}
-                <span className="text-slate-500 italic">Physics Final</span>{' '}
-                starts in 4 hours
-              </p>
-            </div>
-            <span className="text-[9px] font-black text-slate-400 sm:ml-auto">
-              1 HOUR AGO
-            </span>
-          </div>
+          {data?.recentSubmissions && data.recentSubmissions.length > 0 ? data.recentSubmissions.map((sub, i) => (
+             <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-all group gap-2">
+             <div className="flex items-center gap-3">
+               <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] shrink-0"></div>
+               <p className="text-xs md:text-sm font-bold text-slate-700">
+                 New submission: <span className="text-primary italic">{sub.studentName}</span> completed {sub.examTitle}
+               </p>
+             </div>
+             <span className="text-[9px] font-black text-slate-400 sm:ml-auto uppercase">
+               {new Date(sub.time).toLocaleTimeString()}
+             </span>
+           </div>
+          )) : (
+            <p className="text-xs text-slate-300 text-center py-6 border border-dashed rounded-[1.5rem]">No recent activity logs</p>
+          )}
         </div>
       </div>
     </div>
