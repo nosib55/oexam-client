@@ -65,7 +65,11 @@ export default function ReviewScript() {
   };
 
   if (loading)
-    return <div className="text-center py-20 font-bold">Loading Script...</div>;
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-8 pb-20">

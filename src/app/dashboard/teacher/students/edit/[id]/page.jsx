@@ -103,14 +103,11 @@ const EditStudent = () => {
   };
 
   if (fetching)
-    return (
-      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <FaSpinner className="animate-spin text-primary text-4xl" />
-        <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
-          Loading Student Data...
-        </p>
-      </div>
-    );
+      return (
+        <div className="h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      );
 
   return (
     <div className="max-w-5xl mx-auto pb-20 p-4 lg:p-0">

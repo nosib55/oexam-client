@@ -115,12 +115,12 @@ export default function QuestionBankDetailPage({ params }) {
     q.questionText.toLowerCase().includes(search.toLowerCase())
   ) || [];
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      <p className="font-black text-slate-400 uppercase tracking-widest text-xs">Loading Knowledge Base...</p>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
 
   if (!bank) return (
     <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
