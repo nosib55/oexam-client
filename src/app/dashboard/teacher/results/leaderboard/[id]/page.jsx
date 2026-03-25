@@ -43,12 +43,12 @@ export default function ExamLeaderboardPage({ params }) {
     item.student?.email?.toLowerCase().includes(search.toLowerCase())
   ) || [];
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
-      <LuTrophy className="text-primary animate-bounce" size={48} />
-      <p className="font-black text-slate-400 uppercase tracking-widest text-xs">Computing Ranks...</p>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
 
   const topThree = filteredLeaderboard.slice(0, 3);
   const rest = filteredLeaderboard.slice(3);

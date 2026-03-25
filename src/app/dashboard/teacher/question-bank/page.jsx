@@ -55,11 +55,12 @@ export default function QuestionBankList() {
     (bank.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return (
-    <div className="h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 lg:p-12">

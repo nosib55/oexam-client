@@ -86,16 +86,12 @@ export default function ResultsPage() {
 
   const uniqueExams = ['All', ...new Set(results.map(r => r.examName))];
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <FaSpinner className="animate-spin text-primary text-4xl" />
-        <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
-          Calculating Results...
-        </p>
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
-  }
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 pb-10 p-4 lg:p-0">
