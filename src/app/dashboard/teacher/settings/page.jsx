@@ -39,7 +39,9 @@ export default function TeacherProfileSettings() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch("/api/auth/me");
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch("/api/auth/me", { headers });
       const data = await res.json();
       if (res.ok) {
         setFormData({
@@ -107,9 +109,13 @@ export default function TeacherProfileSettings() {
 
   const handleSave = async () => {
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch("/api/auth/me", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,

@@ -7,23 +7,26 @@ export async function GET(req) {
     try {
         await dbConnect();
 
-        const token = req.cookies.get("token")?.value;
+        let token = req.headers.get("authorization")?.split(" ")[1];
+        if (!token) {
+            token = req.cookies.get("token")?.value;
+        }
 
         if (!token) {
-            return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+            return NextResponse.json({ message: "Not authenticated. No token found in session." }, { status: 401 });
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.id).select("-password -otp -otpExpires");
 
         if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
+            return NextResponse.json({ message: "User account no longer exists." }, { status: 404 });
         }
 
         return NextResponse.json(user);
     } catch (error) {
         console.error("Profile fetch error:", error);
-        return NextResponse.json({ message: "Server error" }, { status: 500 });
+        return NextResponse.json({ message: error.message || "Server error accessing profile" }, { status: 500 });
     }
 }
 
@@ -39,13 +42,17 @@ export async function PUT(req) {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const body = await req.json();
-        const { name, email, image } = body;
+        const { name, email, image, institution, location, userClass } = body;
 
         const user = await User.findByIdAndUpdate(
             decoded.id,
-            { name, email, image },
+            { name, email, image, institution, location, userClass },
             { new: true, runValidators: true }
         ).select("-password -otp -otpExpires");
+
+        if (!user) {
+            return NextResponse.json({ message: "User not found" }, { status: 404 });
+        }
 
         return NextResponse.json({
             message: "Profile updated successfully",
@@ -53,6 +60,6 @@ export async function PUT(req) {
         });
     } catch (error) {
         console.error("Profile update error:", error);
-        return NextResponse.json({ message: "Server error" }, { status: 500 });
+        return NextResponse.json({ message: error.message || "Server error" }, { status: 500 });
     }
 }
