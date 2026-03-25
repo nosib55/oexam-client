@@ -71,6 +71,15 @@ export default function ReviewScript() {
       </div>
     );
 
+  if (!result) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center gap-4">
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Script details not found</p>
+          <button onClick={() => router.back()} className="text-primary font-black text-xs uppercase hover:underline tracking-widest">Go Back</button>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-8 pb-20">
       {/* Header */}
