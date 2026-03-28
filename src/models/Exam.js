@@ -1,0 +1,62 @@
+import mongoose from 'mongoose';
+
+const ExamSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    questionBankId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'QuestionBank',
+    },
+    classId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Class',
+    },
+    subject: {
+      type: String,
+      required: true,
+    },
+    duration: {
+      type: Number, // in minutes
+      required: true,
+    },
+    totalMarks: {
+      type: Number,
+      required: true,
+    },
+    markPerQuestion: { type: Number },
+    questions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Question',
+      },
+    ],
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    scheduledAt: {
+      type: Date,
+    },
+    status: {
+      type: String,
+      enum: ['draft', 'published', 'completed', 'running', 'stopped', 'closed'],
+      default: 'draft',
+    },
+    startTime: { type: Date },
+    endTime: { type: Date },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true },
+);
+
+export default mongoose.models.Exam || mongoose.model('Exam', ExamSchema);

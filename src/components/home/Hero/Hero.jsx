@@ -9,11 +9,11 @@ const Hero = () => {
           {/* Left Content */}
           <div className="space-y-8">
             <div className="badge badge-outline badge-primary font-bold py-4 px-6 rounded-full animate-bounce">
-              🚀 New: BCS Model Test 2026 is Live!
+              🚀 SMART EXAM SOLUTION
             </div>
             <h1 className="text-4xl md:text-6xl font-black leading-tight text-base-content uppercase tracking-tighter">
-              O-EXAM: The Smartest{' '}
-              <span className="text-primary">Evaluation</span> Tool
+             <span className="text-primary">EXAMINERLY</span> : The Smartest{' '}
+              <span className="">Evaluation</span> Tool
             </h1>
             <p className="text-sm md:text-lg opacity-70 max-w-lg leading-relaxed">
               Join thousands of students and prepare for your dreams with

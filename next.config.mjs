@@ -1,17 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   images: {
     unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ui-avatars.com',
-        pathname: '/api/**',
+        hostname: 'i.ibb.co',
       },
       {
         protocol: 'https',
-        hostname: 'i.ibb.co.com',
+        hostname: 'i.pravatar.cc',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        pathname: '/api/**',
       },
     ],
   },

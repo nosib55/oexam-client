@@ -157,7 +157,8 @@ const Footer = () => {
         <div className="border-t border-base-150 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm font-bold opacity-40">
             ©{new Date().getFullYear()}{' '}
-            <span className="text-primary">O-EXAM</span>. All rights reserved.
+            <span className="text-primary">EXAMINERLY</span>. All rights
+            reserved.
           </p>
           <div className="flex gap-6 text-xs font-black uppercase tracking-[0.2em] opacity-40">
             <span className="hover:opacity-100 cursor-pointer">Security</span>
