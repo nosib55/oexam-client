@@ -126,7 +126,7 @@ const HowItWorks = () => {
         {/* Global Footer Note */}
         <div className="mt-24 flex flex-col md:flex-row items-center justify-center gap-6">
           <div className="flex -space-x-4">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4].map(i => (
               <div
                 key={i}
                 className="w-12 h-12 rounded-full border-4 border-base-100 bg-base-300 overflow-hidden shadow-xl"
@@ -141,7 +141,7 @@ const HowItWorks = () => {
           <p className="text-base-content/50 font-bold text-sm text-center md:text-left">
             Join <span className="text-base-content">2,000+</span> students
             already <br className="hidden md:block" /> improving their grades
-            with O-Exam.
+            with EXAMINERLY.
           </p>
         </div>
       </div>

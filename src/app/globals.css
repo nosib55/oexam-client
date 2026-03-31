@@ -67,3 +67,28 @@
         animation: subtle-pulse 1.5s ease-in-out infinite;
     }
 }
+
+/* SweetAlert Button Fix */
+.swal2-confirm {
+  background-color: #3b82f6 !important; /* Blue color */
+  color: white !important;
+  padding: 10px 24px !important;
+  border-radius: 8px !important;
+  font-weight: bold !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.swal2-cancel {
+  background-color: #ef4444 !important; /* Red color */
+  color: white !important;
+  padding: 10px 24px !important;
+  border-radius: 8px !important;
+  font-weight: bold !important;
+  border: none !important;
+}
+
+/* Ensure the modal is on top of everything */
+.swal2-container {
+  z-index: 99999 !important;
+}

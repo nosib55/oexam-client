@@ -5,7 +5,7 @@ const Logo = () => {
   return (
     <Link
       href="/"
-      className="flex items-center transition-all duration-300"
+      className="flex transition-all duration-300"
     >
       <div className="relative flex items-center justify-center">
 
@@ -16,7 +16,7 @@ const Logo = () => {
           width={200}   // Increase size here
           height={100}   // Keep ratio correct
           priority
-          className="object-contain"
+          className="object-contain w-[100px] h-[50px] md:w-[200px] md:h-[100px]"
         />
 
       </div>
