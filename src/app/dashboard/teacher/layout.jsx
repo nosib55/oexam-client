@@ -70,7 +70,7 @@ export default function TeacherLayout({ children }) {
     },
     {
       name: 'Leaderboard',
-      icon: <MdLeaderboard size={20}/>,
+      icon: <MdLeaderboard size={20} />,
       href: '/dashboard/teacher/leaderboard',
     },
     {
@@ -104,11 +104,10 @@ export default function TeacherLayout({ children }) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center justify-between group px-4 py-3.5 rounded-2xl transition-all duration-300 ${
-                  isActive
-                    ? 'bg-primary text-secondary shadow-lg shadow-primary/20'
-                    : 'text-slate-500 hover:bg-primary hover:text-secondary'
-                }`}
+                className={`flex items-center justify-between group px-4 py-3.5 rounded-2xl transition-all duration-300 ${isActive
+                  ? 'bg-primary text-secondary shadow-lg shadow-primary/20'
+                  : 'text-slate-500 hover:bg-primary hover:text-secondary'
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <span
@@ -157,18 +156,17 @@ export default function TeacherLayout({ children }) {
 
       {/* ================= TABLET/MOBILE BOTTOM NAV (Fixed at Bottom) ================= */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] px-2">
-        <div className="flex justify-around items-center h-16 max-w-md mx-auto">
+        <div className="flex justify-around items-center h-16 mx-auto px-4">
           {menuItems.map(item => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all ${
-                  isActive
-                    ? 'text-primary'
-                    : 'text-slate-400 hover:text-primary'
-                }`}
+                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all ${isActive
+                  ? 'text-primary'
+                  : 'text-slate-400 hover:text-primary'
+                  }`}
               >
                 <div
                   className={`transition-transform ${isActive ? 'scale-110' : ''}`}
@@ -176,7 +174,7 @@ export default function TeacherLayout({ children }) {
                   {item.icon}
                 </div>
                 <span
-                  className={`text-[10px] font-bold tracking-tighter ${isActive ? 'opacity-100' : 'opacity-70'}`}
+                  className={`text-[9px] font-black uppercase tracking-tighter transition-all duration-300 ${isActive ? 'opacity-100 h-auto scale-100' : 'opacity-0 h-0 scale-50 hidden md:block'}`}
                 >
                   {item.name}
                 </span>
