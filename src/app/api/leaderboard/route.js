@@ -1,5 +1,7 @@
 import connectDB from '@/lib/mongodb';
 import Result from '@/models/Result';
+import User from '@/models/User'; 
+import Student from '@/models/Student';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -7,42 +9,57 @@ export async function GET() {
     await connectDB();
 
     const leaderboard = await Result.aggregate([
+      { $match: { isVerified: true } },
       {
-        $match: { isVerified: true } 
+        $lookup: {
+          from: 'students', // firstly, try to find student info in the Student collection
+          localField: 'student',
+          foreignField: '_id',
+          as: 'studentInfo',
+        },
       },
       {
         $lookup: {
-          from: 'students', 
+          from: 'users', // then, if no student info found, try to find user info in the User collection
           localField: 'student',
           foreignField: '_id',
-          as: 'studentInfo'
-        }
+          as: 'userInfo',
+        },
       },
-      { $unwind: '$studentInfo' },
       {
         $project: {
-          studentName: { $ifNull: ['$studentInfo.fullName', '$studentInfo.name'] },
-          studentEmail: '$studentInfo.email',
-          marks: '$marksObtained', 
+          // if has studentInfo, use that; otherwise, fallback to userInfo
+          studentName: {
+            $ifNull: [
+              { $arrayElemAt: ['$studentInfo.fullName', 0] }, // Student model fullName
+              { $arrayElemAt: ['$userInfo.name', 0] }, // User model name
+              'Unknown Student',
+            ],
+          },
+          studentEmail: {
+            $ifNull: [
+              { $arrayElemAt: ['$studentInfo.email', 0] },
+              { $arrayElemAt: ['$userInfo.email', 0] },
+              'N/A',
+            ],
+          },
+          marks: '$marksObtained',
           total: '$totalMarks',
           submittedAt: 1,
-        }
+        },
       },
       { $sort: { marks: -1, submittedAt: 1 } },
-      { $limit: 100 }
+      { $limit: 100 },
     ]);
 
     const rankedData = leaderboard.map((item, index) => ({
+      ...item,
       rank: index + 1,
-      studentName: item.studentName || 'Unknown',
-      totalMarks: item.marks || 0, 
-      ...item
+      totalMarks: item.marks,
     }));
 
     return NextResponse.json(rankedData, { status: 200 });
-
   } catch (error) {
-    console.error("Leaderboard Error:", error);
-    return NextResponse.json({ error: "Failed to load leaderboard" }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

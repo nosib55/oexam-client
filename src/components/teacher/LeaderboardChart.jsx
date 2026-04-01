@@ -1,4 +1,5 @@
-import React from 'react';
+// components/teacher/LeaderboardChart.js
+'use client';
 import {
   BarChart,
   Bar,
@@ -11,52 +12,57 @@ import {
 } from 'recharts';
 
 const LeaderboardChart = ({ data }) => {
-  const chartData = data.slice(0, 10).map(item => ({
-    name: item.studentName.split(' ')[0], 
-    marks: item.totalMarks,
-  }));
-
-  const colors = ['#6d4fc2', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'];
+  // Take only top 10 for better visualization
+  const chartData = data.slice(0, 10);
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-10">
-      <h3 className="text-xl font-bold text-gray-800 mb-6">
-        Top 10 Performers Analytics
-      </h3>
-      <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="#f0f0f0"
-            />
-            <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#6b7280', fontSize: 12 }}
-            />
-            <YAxis hide />
-            <Tooltip
-              cursor={{ fill: '#f3f4f6' }}
-              contentStyle={{
-                borderRadius: '10px',
-                border: 'none',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              }}
-            />
-            <Bar dataKey="marks" radius={[10, 10, 0, 0]} barSize={40}>
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={colors[index % colors.length]}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+    <div className="w-full h-[350px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+        >
+          <defs>
+            <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+              <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.8} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            vertical={false}
+            stroke="#f1f5f9"
+          />
+          <XAxis
+            dataKey="studentName"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 500 }}
+            dy={10}
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: '#94a3b8', fontSize: 12 }}
+          />
+          <Tooltip
+            cursor={{ fill: '#f8fafc' }}
+            contentStyle={{
+              borderRadius: '16px',
+              border: 'none',
+              boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+            }}
+          />
+          <Bar dataKey="totalMarks" radius={[10, 10, 0, 0]} barSize={40}>
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={index === 0 ? '#fbbf24' : 'url(#barGradient)'}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };
