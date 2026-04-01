@@ -23,7 +23,18 @@ export async function GET(req) {
     }
 
     const classes = await Class.find({ teacher: userId }).sort({ createdAt: -1 });
-    return NextResponse.json(classes, { status: 200 });
+    const ClassRequest = (await import('@/models/ClassRequest')).default;
+
+    // Fetch student counts for each class based on COMPLETED/CONFIRMED requests
+    const enrichedClasses = await Promise.all(classes.map(async (cls) => {
+      const studentCount = await ClassRequest.countDocuments({
+        classId: cls._id,
+        status: 'confirmed'
+      });
+      return { ...cls.toObject(), studentCount };
+    }));
+
+    return NextResponse.json(enrichedClasses, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

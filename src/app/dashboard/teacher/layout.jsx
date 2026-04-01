@@ -15,6 +15,7 @@ import {
   LuBell,
   LuLogOut,
 } from 'react-icons/lu';
+import { MdLeaderboard } from 'react-icons/md';
 
 export default function TeacherLayout({ children }) {
   const pathname = usePathname();
@@ -66,6 +67,11 @@ export default function TeacherLayout({ children }) {
       name: 'Results',
       icon: <LuChartBar size={20} />,
       href: '/dashboard/teacher/results',
+    },
+    {
+      name: 'Leaderboard',
+      icon: <MdLeaderboard size={20}/>,
+      href: '/dashboard/teacher/leaderboard',
     },
     {
       name: 'Settings',

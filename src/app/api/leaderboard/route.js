@@ -1,71 +1,65 @@
-import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
+import connectDB from '@/lib/mongodb';
 import Result from '@/models/Result';
-import Exam from '@/models/Exam';
+import User from '@/models/User'; 
+import Student from '@/models/Student';
+import { NextResponse } from 'next/server';
 
-export async function GET(req) {
+export async function GET() {
   try {
-    await dbConnect();
+    await connectDB();
 
-    const { searchParams } = new URL(req.url);
-    const examId = searchParams.get('examId');
-    const limit = parseInt(searchParams.get('limit')) || 100;
-    const showAll = searchParams.get('showAll') === 'true';
+    const leaderboard = await Result.aggregate([
+      { $match: { isVerified: true } },
+      {
+        $lookup: {
+          from: 'students', // firstly, try to find student info in the Student collection
+          localField: 'student',
+          foreignField: '_id',
+          as: 'studentInfo',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users', // then, if no student info found, try to find user info in the User collection
+          localField: 'student',
+          foreignField: '_id',
+          as: 'userInfo',
+        },
+      },
+      {
+        $project: {
+          // if has studentInfo, use that; otherwise, fallback to userInfo
+          studentName: {
+            $ifNull: [
+              { $arrayElemAt: ['$studentInfo.fullName', 0] }, // Student model fullName
+              { $arrayElemAt: ['$userInfo.name', 0] }, // User model name
+              'Unknown Student',
+            ],
+          },
+          studentEmail: {
+            $ifNull: [
+              { $arrayElemAt: ['$studentInfo.email', 0] },
+              { $arrayElemAt: ['$userInfo.email', 0] },
+              'N/A',
+            ],
+          },
+          marks: '$marksObtained',
+          total: '$totalMarks',
+          submittedAt: 1,
+        },
+      },
+      { $sort: { marks: -1, submittedAt: 1 } },
+      { $limit: 100 },
+    ]);
 
-    if (!examId) {
-      return NextResponse.json(
-        { message: 'examId is required' },
-        { status: 400 }
-      );
-    }
-
-    // Verify exam exists
-    const exam = await Exam.findById(examId);
-    if (!exam) {
-      return NextResponse.json(
-        { message: 'Exam not found' },
-        { status: 404 }
-      );
-    }
-
-    // Only return published results unless explicitly requested
-    const query = { exam: examId };
-    if (!showAll) {
-      query.resultPublished = true;
-    }
-
-    // Get results sorted by marks (descending) and submission time (ascending)
-    const results = await Result.find(query)
-      .populate('student', 'name email')
-      .populate('exam', 'title totalMarks')
-      .sort({ marksObtained: -1, completionTime: 1, submittedAt: 1 })
-      .limit(limit);
-
-    // Add rank to each result
-    const leaderboard = results.map((result, index) => ({
+    const rankedData = leaderboard.map((item, index) => ({
+      ...item,
       rank: index + 1,
-      student: result.student,
-      marksObtained: result.marksObtained,
-      totalMarks: result.totalMarks || exam.totalMarks,
-      percentage: ((result.marksObtained / (result.totalMarks || exam.totalMarks)) * 100).toFixed(2),
-      completionTime: result.completionTime,
-      submittedAt: result.submittedAt,
+      totalMarks: item.marks,
     }));
 
-    return NextResponse.json(
-      {
-        examId,
-        examTitle: exam.title,
-        leaderboard,
-        totalSubmissions: leaderboard.length,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json(rankedData, { status: 200 });
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
-    return NextResponse.json(
-      { message: 'Error fetching leaderboard' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
