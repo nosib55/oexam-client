@@ -6,14 +6,11 @@ export async function GET() {
   try {
     await connectDB();
 
-    // fetching verified results and joining with student info
     const leaderboard = await Result.aggregate([
       {
-        // 
         $match: { isVerified: true } 
       },
       {
-        // 
         $lookup: {
           from: 'students', 
           localField: 'student',
@@ -23,27 +20,22 @@ export async function GET() {
       },
       { $unwind: '$studentInfo' },
       {
-        // 
         $project: {
-          studentName: '$studentInfo.fullName',
+          studentName: { $ifNull: ['$studentInfo.fullName', '$studentInfo.name'] },
           studentEmail: '$studentInfo.email',
-          totalMarks: 1,
+          marks: '$marksObtained', 
+          total: '$totalMarks',
           submittedAt: 1,
         }
       },
-      {
-        // sorting by totalMarks descending and then by submission time ascending
-        $sort: { totalMarks: -1, submittedAt: 1 }
-      },
-      {
-        // up to 100 
-        $limit: 100
-      }
+      { $sort: { marks: -1, submittedAt: 1 } },
+      { $limit: 100 }
     ]);
 
-    // sum ranking logic
     const rankedData = leaderboard.map((item, index) => ({
       rank: index + 1,
+      studentName: item.studentName || 'Unknown',
+      totalMarks: item.marks || 0, 
       ...item
     }));
 
@@ -51,9 +43,6 @@ export async function GET() {
 
   } catch (error) {
     console.error("Leaderboard Error:", error);
-    return NextResponse.json(
-      { error: "Failed to load leaderboard" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to load leaderboard" }, { status: 500 });
   }
 }
