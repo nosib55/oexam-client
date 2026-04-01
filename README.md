@@ -9,10 +9,11 @@ Built with React + Vite for fast and modern web performance.
 📊 Result & score view
 🧑‍🏫 Admin dashboard
 📱 Responsive design
-🛠️ Tech Stack
+
+🛠️ Tech Stack :
 React
 Vite
-JavaScript / TypeScript
+JavaScript / 
 Tailwind CSS
 Axios
 React Router
