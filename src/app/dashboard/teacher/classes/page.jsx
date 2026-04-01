@@ -75,6 +75,44 @@ export default function TeacherClasses() {
     }
   };
 
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Deleting this class will also remove all its join requests!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete it',
+      background: '#ffffff',
+      customClass: {
+        popup: 'rounded-[2rem]',
+        confirmButton: 'rounded-xl font-bold px-6 py-3',
+        cancelButton: 'rounded-xl font-bold px-6 py-3'
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axios.delete(`/api/teacher/classes/${id}`);
+          if (res.status === 200) {
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Class removed successfully.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false,
+              background: '#ffffff',
+              customClass: { popup: 'rounded-[2rem]' }
+            });
+            fetchClasses();
+          }
+        } catch (err) {
+          Swal.fire('Error', 'Failed to delete class', 'error');
+        }
+      }
+    });
+  };
+
   if (loading) return (
     <div className="h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -109,7 +147,13 @@ export default function TeacherClasses() {
           {classes.map((cls) => (
             <div key={cls._id} className="group bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-2xl transition-all hover:-translate-y-1 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="text-slate-300 hover:text-red-500 transition-colors">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(cls._id);
+                  }}
+                  className="text-slate-300 hover:text-red-500 transition-colors"
+                >
                   <LuTrash2 size={18} />
                 </button>
               </div>

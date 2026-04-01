@@ -4,6 +4,8 @@ import QuestionBank from '@/models/QuestionBank';
 import Result from '@/models/Result';
 import Class from '@/models/Class';
 import ClassRequest from '@/models/ClassRequest'; 
+import User from '@/models/User';
+import Student from '@/models/Student';
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 

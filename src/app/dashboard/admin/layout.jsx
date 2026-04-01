@@ -9,7 +9,6 @@ import {
   LuUsers,
   LuUserCheck,
   LuSchool,
-  LuMessageSquare,
   LuSettings,
   LuLogOut,
   LuMenu,
@@ -45,7 +44,6 @@ export default function AdminLayout({ children }) {
     { name: "Students", path: "/dashboard/admin/student", icon: <LuUsers /> },
     { name: "Teachers", path: "/dashboard/admin/teacher", icon: <LuUserCheck /> },
     { name: "Institutions", path: "/dashboard/admin/institutions", icon: <LuSchool /> },
-    { name: "Complaints", path: "/dashboard/admin/complaints", icon: <LuMessageSquare /> },
     { name: "Settings", path: "/dashboard/admin/settings", icon: <LuSettings /> },
   ];
 
