@@ -27,16 +27,12 @@ const Leaderboard = () => {
     item.studentName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-[#f8fafc]">
-        <div className="relative w-20 h-20">
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-100 rounded-full"></div>
-          <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
-        </div>
-      </div>
-    );
-  }
+ if (loading)
+   return (
+     <div className="h-screen flex items-center justify-center">
+       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+     </div>
+   );
 
   const topThree = filteredData.slice(0, 3);
   const restOfStudents = filteredData.slice(3);
