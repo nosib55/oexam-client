@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 const Features = () => {
   const features = [
     {
-      title: 'AI Eye Tracking',
-      desc: 'Real-time gaze detection and environment analysis to prevent academic dishonesty automatically.',
+      title: "AI Eye Tracking",
+      desc: "Real-time gaze detection and environment analysis to prevent academic dishonesty automatically.",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -26,11 +26,11 @@ const Features = () => {
           />
         </svg>
       ),
-      iconBg: 'bg-[#FF4D6D]', // Pinkish Red
+      iconBg: "bg-[#FF4D6D]", // Pinkish Red
     },
     {
-      title: 'Question Randomization',
-      desc: 'Dynamic shuffle logic ensures no two students receive the same question order or options.',
+      title: "Question Randomization",
+      desc: "Dynamic shuffle logic ensures no two students receive the same question order or options.",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -47,11 +47,11 @@ const Features = () => {
           />
         </svg>
       ),
-      iconBg: 'bg-[#00C896]', // Teal Green
+      iconBg: "bg-[#00C896]", // Teal Green
     },
     {
-      title: 'Instant Evaluation',
-      desc: 'Auto-grade objective questions and get immediate performance reports for students and faculty.',
+      title: "Instant Evaluation",
+      desc: "Auto-grade objective questions and get immediate performance reports for students and faculty.",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -68,11 +68,11 @@ const Features = () => {
           />
         </svg>
       ),
-      iconBg: 'bg-[#FFB72B]', // Orange/Yellow
+      iconBg: "bg-[#FFB72B]", // Orange/Yellow
     },
     {
-      title: 'Lockdown Browser',
-      desc: 'Prevent switching tabs, opening new windows, or accessing external tools during active sessions.',
+      title: "Lockdown Browser",
+      desc: "Prevent switching tabs, opening new windows, or accessing external tools during active sessions.",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -89,11 +89,11 @@ const Features = () => {
           />
         </svg>
       ),
-      iconBg: 'bg-[#5D5FEF]', // Blue/Indigo
+      iconBg: "bg-[#5D5FEF]", // Blue/Indigo
     },
     {
-      title: 'Multi-device Ready',
-      desc: 'Conduct exams seamlessly on tablets, laptops, or desktops with fully responsive layouts.',
+      title: "Multi-device Ready",
+      desc: "Conduct exams seamlessly on tablets, laptops, or desktops with fully responsive layouts.",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -110,11 +110,11 @@ const Features = () => {
           />
         </svg>
       ),
-      iconBg: 'bg-[#2D60FF]', // Bright Blue
+      iconBg: "bg-[#2D60FF]", // Bright Blue
     },
     {
-      title: 'Rich Media Support',
-      desc: 'Embed high-definition videos, interactive charts, and complex math equations into any question.',
+      title: "Rich Media Support",
+      desc: "Embed high-definition videos, interactive charts, and complex math equations into any question.",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -136,13 +136,13 @@ const Features = () => {
           />
         </svg>
       ),
-      iconBg: 'bg-[#9277FF]', 
+      iconBg: "bg-[#9277FF]",
     },
   ];
 
   return (
-    <section className="py-20 bg-[#F8FAFC]">
-      {' '}
+    <section className="py-20">
+      {" "}
       {/* Light gray/white background as per image */}
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-10 lg:px-20">
         {/* Header */}

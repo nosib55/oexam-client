@@ -1,38 +1,35 @@
-'use client';
-import Link from 'next/link';
-import Logo from '../Logo/Logo';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
-
+"use client";
+import Link from "next/link";
+import Logo from "../Logo/Logo";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     setUser(null);
-    window.location.href = '/';
+    window.location.href = "/";
   };
-   
+
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (error) {
-        console.error('Error parsing user data', error);
+        console.error("Error parsing user data", error);
       }
     }
   }, []);
 
-
   const navRoutes = [
-    { name: 'Home', href: '/', icon: '🏠' },
-    { name: 'Pricing', href: '#pricing', icon: '💎' },
-    { name: 'How it works', href: '#how-it-works', icon: '⚙️' },
-    { name: 'About', href: '#about', icon: '✨' },
+    { name: "Home", href: "/", icon: "🏠" },
+    { name: "How it works", href: "#how-it-works", icon: "⚙️" },
+    { name: "About", href: "#about", icon: "✨" },
   ];
 
   return (
@@ -70,7 +67,7 @@ const Navbar = () => {
                 </p>
               </div>
               <div className="space-y-1">
-                {navRoutes.map(item => (
+                {navRoutes.map((item) => (
                   <li key={item.name}>
                     <Link
                       href={item.href}
@@ -94,7 +91,7 @@ const Navbar = () => {
         {/* Navbar Center: Desktop Menu */}
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal gap-2">
-            {navRoutes.map(item => (
+            {navRoutes.map((item) => (
               <li key={item.name}>
                 <Link
                   href={item.href}
@@ -213,7 +210,7 @@ const Navbar = () => {
                 >
                   <div className="w-9 rounded-full relative overflow-hidden">
                     <Image
-                      src={user?.image || 'https://ibb.co.com/WW2RJLhF'}
+                      src={user?.image || "https://ibb.co.com/WW2RJLhF"}
                       alt="User"
                       width={40}
                       height={40}
@@ -295,10 +292,10 @@ const Navbar = () => {
           )}
 
           <Link
-            href={'/auth/login'}
+            href={"/auth/login"}
             className="bg-primary rounded-2xl px-4 md:px-8 py-4 text-[10px] md:text-base font-black text-white shadow-xl shadow-primary/20 border-none hover:translate-y-[-3px] hover:shadow-primary/40 active:scale-95 transition-all duration-500 uppercase tracking-tighter"
           >
-            {user ? 'Dashboard' : 'Login'}
+            {user ? "Dashboard" : "Login"}
           </Link>
         </div>
       </div>
