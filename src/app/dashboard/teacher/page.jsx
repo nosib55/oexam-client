@@ -70,9 +70,9 @@ export default function TeacherPage() {
   ];
 
   if (loading) return (
-     <div className="h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-t-4 border-primary rounded-full animate-spin"></div>
-     </div>
+    <div className="h-screen flex items-center justify-center">
+      <div className="w-16 h-16 border-t-4 border-primary rounded-full animate-spin"></div>
+    </div>
   );
 
   return (
@@ -165,36 +165,36 @@ export default function TeacherPage() {
 
         <div className="p-6 md:p-8 space-y-6">
           {data?.runningExam ? (
-             <div className="p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 bg-white hover:border-primary/20 transition-all shadow-sm">
-             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
-               <div className="space-y-3 w-full xl:w-2/3">
-                 <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase">
-                   Status: Running
-                 </span>
-                 <h4 className="text-xl md:text-2xl font-black text-slate-800 leading-tight">
-                   {data.runningExam.title}
-                 </h4>
-                 <p className="text-xs md:text-sm text-slate-500 font-medium italic">
-                   Currently ongoing assessment hall
-                 </p>
-               </div>
+            <div className="p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 bg-white hover:border-primary/20 transition-all shadow-sm">
+              <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+                <div className="space-y-3 w-full xl:w-2/3">
+                  <span className="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase">
+                    Status: Running
+                  </span>
+                  <h4 className="text-xl md:text-2xl font-black text-slate-800 leading-tight">
+                    {data.runningExam.title}
+                  </h4>
+                  <p className="text-xs md:text-sm text-slate-500 font-medium italic">
+                    Currently ongoing assessment hall
+                  </p>
+                </div>
 
-               <div className="flex flex-wrap gap-2 w-full xl:w-auto">
-                 <Link href={`/dashboard/teacher/exams/monitor/${data.runningExam._id}`} className="flex-1 xl:flex-none">
+                <div className="flex flex-wrap gap-2 w-full xl:w-auto">
+                  <Link href={`/dashboard/teacher/exams/monitor/${data.runningExam._id}`} className="flex-1 xl:flex-none">
                     <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 shadow-xl shadow-slate-200">
                       Monitor Live
                     </button>
-                 </Link>
-               </div>
-             </div>
-           </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="p-12 text-center rounded-[2rem] bg-slate-50 border border-dashed border-slate-200">
-               <LuCalendar size={48} className="mx-auto text-slate-200 mb-4" />
-               <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No exams currently running</p>
-               <Link href="/dashboard/teacher/exams/new">
-                 <button className="mt-4 text-xs font-black text-primary uppercase hover:underline">Start an Assessment</button>
-               </Link>
+              <LuCalendar size={48} className="mx-auto text-slate-200 mb-4" />
+              <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No exams currently running</p>
+              <Link href="/dashboard/teacher/exams/new">
+                <button className="mt-4 text-xs font-black text-primary uppercase hover:underline">Start an Assessment</button>
+              </Link>
             </div>
           )}
         </div>
@@ -282,17 +282,17 @@ export default function TeacherPage() {
 
         <div className="space-y-3">
           {data?.recentSubmissions && data.recentSubmissions.length > 0 ? data.recentSubmissions.map((sub, i) => (
-             <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-all group gap-2">
-             <div className="flex items-center gap-3">
-               <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] shrink-0"></div>
-               <p className="text-xs md:text-sm font-bold text-slate-700">
-                 New submission: <span className="text-primary italic">{sub.studentName}</span> completed {sub.examTitle}
-               </p>
-             </div>
-             <span className="text-[9px] font-black text-slate-400 sm:ml-auto uppercase">
-               {new Date(sub.time).toLocaleTimeString()}
-             </span>
-           </div>
+            <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 rounded-2xl md:rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white transition-all group gap-2">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] shrink-0"></div>
+                <p className="text-xs md:text-sm font-bold text-slate-700">
+                  New submission: <span className="text-primary italic">{sub.studentName}</span> completed {sub.examTitle}
+                </p>
+              </div>
+              <span className="text-[9px] font-black text-slate-400 sm:ml-auto uppercase">
+                {new Date(sub.time).toLocaleTimeString()}
+              </span>
+            </div>
           )) : (
             <p className="text-xs text-slate-300 text-center py-6 border border-dashed rounded-[1.5rem]">No recent activity logs</p>
           )}

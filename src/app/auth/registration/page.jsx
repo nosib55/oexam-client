@@ -109,149 +109,130 @@ export default function RegisterPage() {
       };
 
       return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8">
+            <h1 className="text-2xl font-bold mb-6 text-center">
+              Create Account
+            </h1>
 
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="flex gap-2 mb-6">
+              <button
+                type="button"
+                onClick={() => setRole('student')}
+                className={`flex-1 p-2 rounded ${
+                  role === 'student' ? 'bg-[#004aad] text-white' : 'bg-gray-200'
+                }`}
+              >
+                Student{' '}
+              </button>
 
-                  <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8">
-
-                        <h1 className="text-2xl font-bold mb-6 text-center">
-                              Create Account
-                        </h1>
-
-                        <div className="flex gap-2 mb-6">
-
-                              <button
-                                    type="button"
-                                    onClick={() => setRole("student")}
-                                    className={`flex-1 p-2 rounded ${role === "student"
-                                          ? "bg-purple-600 text-white"
-                                          : "bg-gray-200"
-                                          }`}
-
-                              >
-
-                                    Student </button>
-
-                              <button
-                                    type="button"
-                                    onClick={() => setRole("teacher")}
-                                    className={`flex-1 p-2 rounded ${role === "teacher"
-                                          ? "bg-purple-600 text-white"
-                                          : "bg-gray-200"
-                                          }`}
-
-                              >
-
-                                    Teacher </button>
-
-                        </div>
-
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
-                              <input
-                                    placeholder="Full Name"
-                                    className="w-full border p-2 rounded"
-                                    {...register("name", { required: true })}
-                              />
-
-                              {errors.name && <p className="text-red-500 text-sm">Name required</p>}
-
-                              <input
-                                    type="email"
-                                    placeholder="Email"
-                                    className="w-full border p-2 rounded"
-                                    {...register("email", { required: true })}
-                              />
-
-                              {errors.email && <p className="text-red-500 text-sm">Email required</p>}
-
-                              <input
-                                    type="password"
-                                    placeholder="Password"
-                                    className="w-full border p-2 rounded"
-                                    {...register("password", { required: true })}
-                              />
-
-                              <input
-                                    type="password"
-                                    placeholder="Confirm Password"
-                                    className="w-full border p-2 rounded"
-                                    {...register("confirmPassword", { required: true })}
-                              />
-
-                              <input
-                                    placeholder="Institution"
-                                    className="w-full border p-2 rounded"
-                                    {...register("institution", { required: role !== "admin" })}
-                              />
-
-                              <input
-                                    placeholder="Location"
-                                    className="w-full border p-2 rounded"
-                                    {...register("location", { required: true })}
-                              />
-
-                              {role === "student" && (
-
-                                    <select
-                                          className="w-full border p-2 rounded"
-                                          {...register("class", { required: true })}
-
-                                    >
-
-                                          <option value="">Select Class</option>
-
-                                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((c) => (
-
-                                                <option key={c} value={c}>
-                                                      Class {c}
-                                                </option>
-                                          ))}
-
-                                    </select>
-
-                              )}
-
-                              <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full bg-purple-600 text-white py-2 rounded font-semibold"
-                              >
-                                    {loading ? "Registering..." : "Register"}
-                              </button>
-
-                              <div className="flex items-center gap-3 my-4">
-                                    <div className="flex-1 h-[1px] bg-gray-200" />
-                                    <span className="text-xs text-gray-400">Or</span>
-                                    <div className="flex-1 h-[1px] bg-gray-200" />
-                              </div>
-
-                              <button
-                                    type="button"
-                                    onClick={handleGoogleLogin}
-                                    disabled={loading}
-                                    className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-2 rounded font-semibold hover:bg-gray-50 transition"
-                              >
-                                    <FcGoogle className="text-xl" />
-                                    <span>Google Sign Up</span>
-                              </button>
-
-                        </form>
-
-                        <p className="text-center text-sm mt-6">
-
-                              Already have an account?{" "}
-
-                              <Link href="/auth/login" className="text-purple-600">
-                                    Login
-                              </Link>
-
-                        </p>
-
-                  </div>
-
+              <button
+                type="button"
+                onClick={() => setRole('teacher')}
+                className={`flex-1 p-2 rounded ${
+                  role === 'teacher' ? 'bg-[#004aad] text-white' : 'bg-gray-200'
+                }`}
+              >
+                Teacher{' '}
+              </button>
             </div>
 
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <input
+                placeholder="Full Name"
+                className="w-full border p-2 rounded"
+                {...register('name', { required: true })}
+              />
+
+              {errors.name && (
+                <p className="text-red-500 text-sm">Name required</p>
+              )}
+
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-full border p-2 rounded"
+                {...register('email', { required: true })}
+              />
+
+              {errors.email && (
+                <p className="text-red-500 text-sm">Email required</p>
+              )}
+
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full border p-2 rounded"
+                {...register('password', { required: true })}
+              />
+
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                className="w-full border p-2 rounded"
+                {...register('confirmPassword', { required: true })}
+              />
+
+              <input
+                placeholder="Institution"
+                className="w-full border p-2 rounded"
+                {...register('institution', { required: role !== 'admin' })}
+              />
+
+              <input
+                placeholder="Location"
+                className="w-full border p-2 rounded"
+                {...register('location', { required: true })}
+              />
+
+              {role === 'student' && (
+                <select
+                  className="w-full border p-2 rounded"
+                  {...register('class', { required: true })}
+                >
+                  <option value="">Select Class</option>
+
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => (
+                    <option key={c} value={c}>
+                      Class {c}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#004aad] text-white py-2 rounded font-semibold"
+              >
+                {loading ? 'Registering...' : 'Register'}
+              </button>
+
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-[1px] bg-gray-200" />
+                <span className="text-xs text-gray-400">Or</span>
+                <div className="flex-1 h-[1px] bg-gray-200" />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-2 rounded font-semibold hover:bg-gray-50 transition"
+              >
+                <FcGoogle className="text-xl" />
+                <span>Google Sign Up</span>
+              </button>
+            </form>
+
+            <p className="text-center text-sm mt-6">
+              Already have an account?{' '}
+              <Link href="/auth/login" className="text-purple-600">
+                Login
+              </Link>
+            </p>
+          </div>
+        </div>
       );
 
 }

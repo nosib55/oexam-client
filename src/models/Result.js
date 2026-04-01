@@ -20,7 +20,7 @@ const resultSchema = new mongoose.Schema({
   marksObtained: { type: Number, default: 0 },
   totalMarks: { type: Number, default: 0 },
   isVerified: { type: Boolean, default: false }, // Teacher verification
-  resultPublished: { type: Boolean, default: true }, 
+  resultPublished: { type: Boolean, default: true },
   submittedAt: { type: Date, default: Date.now },
 });
 

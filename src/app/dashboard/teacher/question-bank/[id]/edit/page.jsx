@@ -366,7 +366,7 @@ export default function EditQuestionBank() {
           ) : (
             questions.map((q, i) => (
               <QuestionCard 
-                key={q.id}
+                key={i}
                 question={q}
                 index={i}
                 updateQuestion={updateQuestion}
