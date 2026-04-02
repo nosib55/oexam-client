@@ -196,8 +196,8 @@ const Navbar = () => {
                   </p>
                 </div>
                 <div className="flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 shadow-sm">
-                  <span className="text-[8px] font-black uppercase text-primary tracking-widest italic">
-                    Verified {user.role}
+                  <span className="text-[8px] font-black uppercase text-primary tracking-widest">
+                    {user.role}
                   </span>
                 </div>
               </div>
@@ -225,7 +225,7 @@ const Navbar = () => {
                   <div className="px-4 py-5 mb-2 bg-gradient-to-br from-primary/5 to-primary/15 rounded-[2rem] flex flex-col items-center text-center">
                     <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden mb-3">
                       <img
-                        src={user.image}
+                        src={user?.image || "https://ibb.co.com/WW2RJLhF"}
                         alt="user"
                         className="w-full h-full object-cover"
                       />
@@ -236,13 +236,13 @@ const Navbar = () => {
                       </p>
                     </div>
                     <span className="text-[10px] font-black uppercase px-3 py-1 bg-primary text-white rounded-full tracking-widest mt-2 shadow-lg shadow-primary/30">
-                      Verified {user.role}
+                      {user.role}
                     </span>
                   </div>
                   <div className="px-2 space-y-1">
                     <li>
                       <Link
-                        href="/profile"
+                        href={`/dashboard/${user.role}/settings`}
                         className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 hover:text-primary transition-all group border-none !outline-none"
                       >
                         <span className="p-2 bg-base-200 rounded-lg group-hover:bg-primary/20">
@@ -253,7 +253,7 @@ const Navbar = () => {
                     </li>
                     <li>
                       <Link
-                        href="/profile/settings"
+                        href={`/dashboard/${user.role}/settings`}
                         className="rounded-xl py-3 flex items-center gap-3 hover:bg-primary/10 hover:text-primary transition-all group border-none !outline-none"
                       >
                         <span className="p-2 bg-base-200 rounded-lg group-hover:bg-primary/20">
