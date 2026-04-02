@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   LuUsers,
   LuUserCheck,
@@ -328,8 +329,8 @@ export default function AdminDashboard() {
               Real-time orchestration of platform resources. Monitoring user lifecycle events and system integrity.
             </p>
 
-            {/* Health Metrics Dashboard */}
-            <div className="grid grid-cols-2 gap-4 mb-12">
+            {/* Health Metrics & Actions Dashboard */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:bg-white hover:shadow-lg group/metric">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Inbound Traffic</span>
                 <div className="flex items-end gap-2">
@@ -337,11 +338,7 @@ export default function AdminDashboard() {
                   <span className="text-[10px] font-black text-emerald-500 mb-1.5 ring-emerald-500/10 ring-1 px-1.5 rounded-md">/ hr</span>
                 </div>
                 <div className="h-1 bg-slate-200 rounded-full mt-4 overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: '65%' }}
-                    className="h-full bg-blue-500"
-                  ></motion.div>
+                  <motion.div initial={{ width: 0 }} animate={{ width: '65%' }} className="h-full bg-blue-500"></motion.div>
                 </div>
               </div>
               <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:bg-white hover:shadow-lg group/metric">
@@ -351,17 +348,31 @@ export default function AdminDashboard() {
                   <span className="text-[10px] font-black text-indigo-500 mb-1.5 ring-indigo-500/10 ring-1 px-1.5 rounded-md">% acc</span>
                 </div>
                 <div className="h-1 bg-slate-200 rounded-full mt-4 overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: '98%' }}
-                    className="h-full bg-indigo-500"
-                  ></motion.div>
+                  <motion.div initial={{ width: 0 }} animate={{ width: '98%' }} className="h-full bg-indigo-500"></motion.div>
                 </div>
               </div>
             </div>
 
-            <button className="flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-black transition-all shadow-xl shadow-slate-200 transform hover:-translate-y-1">
-              System Audit Console
+            <h4 className="text-sm font-black text-slate-800 tracking-tight mb-4 uppercase tracking-[0.2em]">Administrative Tools</h4>
+            <div className="space-y-3 mb-10">
+              <Link href="/dashboard/admin/institutions" className="flex items-center justify-between p-4 bg-amber-50/50 hover:bg-amber-50 rounded-[1.5rem] transition-all group">
+                <div className="flex items-center gap-3">
+                   <div className="w-8 h-8 rounded-lg bg-white shadow-sm text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform"><LuSchool size={16}/></div>
+                   <span className="font-bold text-slate-700 text-sm">Manage Institutions</span>
+                </div>
+                <LuTrendingUp className="text-slate-400 group-hover:text-amber-600 transition-colors" />
+              </Link>
+              <Link href="/dashboard/admin/complaints" className="flex items-center justify-between p-4 bg-rose-50/50 hover:bg-rose-50 rounded-[1.5rem] transition-all group">
+                <div className="flex items-center gap-3">
+                   <div className="w-8 h-8 rounded-lg bg-white shadow-sm text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform"><LuActivity size={16}/></div>
+                   <span className="font-bold text-slate-700 text-sm">Review Complaints</span>
+                </div>
+                <span className="px-2.5 py-1 bg-rose-200 text-rose-700 text-[10px] font-black rounded-lg">3 NEW</span>
+              </Link>
+            </div>
+
+            <button className="flex items-center gap-3 px-8 py-4 bg-slate-900 w-full justify-center text-white rounded-2xl font-black text-sm hover:bg-black transition-all shadow-xl shadow-slate-200 transform hover:-translate-y-1">
+              Run Audit Console
               <LuTrendingUp size={16} />
             </button>
           </div>

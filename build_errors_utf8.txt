@@ -1,0 +1,157 @@
+﻿
+> oexam-client@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.2.1 (Turbopack)
+- Environments: .env
+
+node.exe : 
+ΓÜá The 
+"middleware" 
+file 
+convention is 
+deprecated. 
+Please use 
+"proxy" 
+instead. 
+Learn more: ht
+tps://nextjs.o
+rg/docs/messag
+es/middleware-
+to-proxy
+At C:\Node 
+js\npm.ps1:29 
+char:3
++   & 
+$NODE_EXE 
+$NPM_CLI_JS 
+$args
++   ~~~~~~~~~~
+~~~~~~~~~~~~~~
+~~~~~
+    + Categor 
+   yInfo      
+        : N   
+ otSpecifi    
+ed: (ΓÜá     
+The "midd    
+le...lewa    
+re-to-pro    
+xy:String    
+) [], Rem    
+oteExcept    
+ion
+    + FullyQu 
+   alifiedEr  
+  rorId : N   
+ ativeComm    
+andError
+ 
+  Creating an optimized production build ...
+
+≡ƒî╝   [35mdaisyUI[39m [2m4.12.10[22m
+Γö£ΓöÇ [32mΓ£ö∩╕Ä[39m 1 theme added[2m		https://daisyui.com/docs/themes[22m
+Γò░ΓöÇ [32mΓ¥ñ∩╕Ä[39m [0mSupport daisyUI project:[0m	[2mhttps://opencollective.com/daisyui[22m
+
+Γ£ô Compiled successfully in 6.0s
+  Running TypeScript ...
+  Finished TypeScript in 173ms ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/68) ...
+  Generating static pages using 15 workers (17/68) 
+  Generating static pages using 15 workers (34/68) 
+  Generating static pages using 15 workers (51/68) 
+Γ£ô Generating static pages using 15 workers (68/68) in 751ms
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /api/admin/institutions
+Γö£ ╞Æ /api/admin/stats
+Γö£ ╞Æ /api/admin/students
+Γö£ ╞Æ /api/admin/teachers
+Γö£ ╞Æ /api/auth/change-password
+Γö£ ╞Æ /api/auth/forgot-password
+Γö£ ╞Æ /api/auth/login
+Γö£ ╞Æ /api/auth/logout
+Γö£ ╞Æ /api/auth/me
+Γö£ ╞Æ /api/auth/register
+Γö£ ╞Æ /api/auth/reset-password
+Γö£ ╞Æ /api/auth/social-login
+Γö£ ╞Æ /api/auth/verify-otp
+Γö£ ╞Æ /api/email-verify
+Γö£ ╞Æ /api/leaderboard
+Γö£ ╞Æ /api/student/class-join
+Γö£ ╞Æ /api/student/exams
+Γö£ ╞Æ /api/student/exams/[id]
+Γö£ ╞Æ /api/student/results
+Γö£ ╞Æ /api/student/results/[examId]
+Γö£ ╞Æ /api/student/submit-exam
+Γö£ ╞Æ /api/teacher/classes
+Γö£ ╞Æ /api/teacher/classes/browse
+Γö£ ╞Æ /api/teacher/classes/requests
+Γö£ ╞Æ /api/teacher/exams
+Γö£ ╞Æ /api/teacher/exams/[id]
+Γö£ ╞Æ /api/teacher/exams/create
+Γö£ ╞Æ /api/teacher/exams/preview/[id]
+Γö£ ╞Æ /api/teacher/question-bank
+Γö£ ╞Æ /api/teacher/question-bank/[id]
+Γö£ ╞Æ /api/teacher/question-bank/count
+Γö£ ╞Æ /api/teacher/question-bank/list
+Γö£ ╞Æ /api/teacher/question-bank/list/[id]
+Γö£ ╞Æ /api/teacher/results
+Γö£ ╞Æ /api/teacher/results/[id]
+Γö£ ╞Æ /api/teacher/stats
+Γö£ ╞Æ /api/teacher/students
+Γö£ ╞Æ /api/teacher/students/[id]
+Γö£ ╞Æ /api/user/verify-status
+Γö£ Γùï /auth/forgot-password
+Γö£ Γùï /auth/login
+Γö£ Γùï /auth/registration
+Γö£ Γùï /auth/verify
+Γö£ Γùï /dashboard/admin
+Γö£ Γùï /dashboard/admin/complaints
+Γö£ Γùï /dashboard/admin/institutions
+Γö£ Γùï /dashboard/admin/settings
+Γö£ Γùï /dashboard/admin/student
+Γö£ Γùï /dashboard/admin/teacher
+Γö£ Γùï /dashboard/student
+Γö£ Γùï /dashboard/student/my_class
+Γö£ Γùï /dashboard/student/my_exam
+Γö£ ╞Æ /dashboard/student/my_exam/[id]
+Γö£ Γùï /dashboard/student/my_result
+Γö£ Γùï /dashboard/student/my_schedule
+Γö£ Γùï /dashboard/student/settings
+Γö£ Γùï /dashboard/teacher
+Γö£ Γùï /dashboard/teacher/classes
+Γö£ Γùï /dashboard/teacher/classes/requests
+Γö£ Γùï /dashboard/teacher/exams
+Γö£ Γùï /dashboard/teacher/exams/create
+Γö£ ╞Æ /dashboard/teacher/exams/edit/[id]
+Γö£ Γùï /dashboard/teacher/exams/examList
+Γö£ Γùï /dashboard/teacher/exams/monitor
+Γö£ Γùï /dashboard/teacher/exams/new
+Γö£ ╞Æ /dashboard/teacher/exams/preview/[id]
+Γö£ Γùï /dashboard/teacher/question-bank
+Γö£ ╞Æ /dashboard/teacher/question-bank/[id]/edit
+Γö£ Γùï /dashboard/teacher/question-bank/create
+Γö£ Γùï /dashboard/teacher/question-banks
+Γö£ ╞Æ /dashboard/teacher/question-banks/[id]
+Γö£ Γùï /dashboard/teacher/results
+Γö£ ╞Æ /dashboard/teacher/results/[id]
+Γö£ ╞Æ /dashboard/teacher/results/leaderboard/[id]
+Γö£ Γùï /dashboard/teacher/results/review
+Γö£ ╞Æ /dashboard/teacher/results/review/[id]
+Γö£ Γùï /dashboard/teacher/settings
+Γö£ Γùï /dashboard/teacher/students
+Γö£ Γùï /dashboard/teacher/students/add
+Γö£ ╞Æ /dashboard/teacher/students/edit/[id]
+Γöö Γùï /forgot-password
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

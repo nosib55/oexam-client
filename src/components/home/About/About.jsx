@@ -1,5 +1,4 @@
-import React from 'react';
-
+import React from "react";
 
 const About = () => {
   return (
@@ -18,34 +17,6 @@ const About = () => {
                 alt="About O-Exam"
                 className="w-full h-[500px] object-cover"
               />
-              {/* Glass Overlay Card */}
-              <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-3xl">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white text-xl">
-                    ✨
-                  </div>
-                  <div>
-                    <p className="font-black leading-none">
-                      Smart AI Evaluation
-                    </p>
-                    <p className="text-black/70 text-xs mt-1 italic font-medium tracking-wide">
-                      Next-gen exam integrity system
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Decorative Floating Stats Card */}
-            <div className="absolute -top-10 -right-6 md:-right-10 z-20 bg-base-100 p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-base-400 hidden md:block animate-bounce-slow">
-              <div className="text-center">
-                <p className="text-4xl font-black text-primary leading-none">
-                  99%
-                </p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-base-content/40 mt-2">
-                  Accuracy Rate
-                </p>
-              </div>
             </div>
           </div>
 
@@ -57,8 +28,7 @@ const About = () => {
               </span>
               <h2 className="text-4xl md:text-6xl font-black text-base-content tracking-tighter leading-[1.1]">
                 Empowering the next <br />
-                <span className="text-primary italic">Generation</span> of
-                learners.
+                <span className="text-primary">Generation</span> of learners.
               </h2>
               <p className="text-lg text-base-content/70 font-medium leading-relaxed">
                 EXAMINERLY isn&apos;t just an assessment tool; it&apos;s a
@@ -71,14 +41,14 @@ const About = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
                 {
-                  title: 'Global Access',
-                  desc: 'Join from anywhere in the world.',
-                  icon: '🌍',
+                  title: "Global Access",
+                  desc: "Join from anywhere in the world.",
+                  icon: "🌍",
                 },
                 {
-                  title: 'AI Proctoring',
-                  desc: 'Secure & fair exam environment.',
-                  icon: '🛡️',
+                  title: "AI Proctoring",
+                  desc: "Secure & fair exam environment.",
+                  icon: "🛡️",
                 },
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 group">
@@ -98,21 +68,21 @@ const About = () => {
             </div>
 
             <div className="pt-4 flex flex-wrap gap-4">
-              <button className="btn btn-primary rounded-2xl px-8 font-black text-white shadow-xl shadow-primary/20 border-none hover:translate-y-[-3px] transition-all duration-300">
-                READ OUR STORY
-              </button>
-              <div className="flex items-center gap-3 px-4">
+              <div className="flex items-center gap-3 px-4 -m-3">
                 <div className="flex -space-x-3">
                   <div className="w-10 h-10 rounded-full border-4 border-base-100 bg-gray-300 overflow-hidden">
-                    <img src="https://i.pravatar.cc/100?u=1" alt="founder" />
+                    <img
+                      src="https://i.ibb.co.com/pBtC96cy/image.png"
+                      alt="founder"
+                    />
                   </div>
                 </div>
                 <div>
                   <p className="text-sm font-black text-base-content leading-none">
-                    Habiba Sultana
+                    Team Prodigy Force
                   </p>
                   <p className="text-[10px] font-bold text-primary uppercase mt-1">
-                    Founder & CEO
+                    Founder
                   </p>
                 </div>
               </div>
