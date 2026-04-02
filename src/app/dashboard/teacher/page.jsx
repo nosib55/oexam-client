@@ -200,43 +200,66 @@ export default function TeacherPage() {
         </div>
       </div>
 
-      {/* ================= BOTTOM GRID: LEADERBOARD & INSIGHT ================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+      {/* ================= BOTTOM GRID: LEADERBOARD & INSIGHT & TOOLS ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         {/* Real-time Leaderboard */}
-        <div className="rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 shadow-sm relative overflow-hidden border bg-white">
+        <div className="rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 shadow-sm relative overflow-hidden border bg-white flex flex-col justify-between">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[40px] rounded-full"></div>
-          <div className="flex items-center gap-3 mb-8">
-            <LuTrophy className="text-amber-400" size={22} />
-            <h3 className="font-black text-lg text-slate-800 tracking-tight">
-              Top Student Performers
-            </h3>
-          </div>
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <LuTrophy className="text-amber-400" size={22} />
+              <h3 className="font-black text-lg text-slate-800 tracking-tight">
+                Top Performers
+              </h3>
+            </div>
 
-          <div className="space-y-5 md:space-y-6">
-            {data?.leaderboard && data.leaderboard.length > 0 ? data.leaderboard.map((student, i) => (
-              <div
-                key={i}
-                className="flex justify-between items-center group cursor-pointer hover:translate-x-1 transition-transform"
-              >
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-black text-slate-300 w-4">
-                    {student.rank}
+            <div className="space-y-4 md:space-y-4">
+              {data?.leaderboard && data.leaderboard.length > 0 ? data.leaderboard.map((student, i) => (
+                <div
+                  key={i}
+                  className="flex justify-between items-center group cursor-pointer hover:translate-x-1 transition-transform"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-[10px] font-black text-slate-300 w-4">
+                      {student.rank}
+                    </span>
+                    <p className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors truncate max-w-[120px]">
+                      {student.name}
+                    </p>
+                  </div>
+                  <span className="text-[11px] font-black px-3 py-1 bg-slate-100 rounded-lg text-slate-600">
+                    {student.mark}%
                   </span>
-                  <p className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors">
-                    {student.name}
-                  </p>
                 </div>
-                <span className="text-[11px] font-black px-3 py-1 bg-slate-100 rounded-lg text-slate-600">
-                  {student.mark}%
-                </span>
-              </div>
-            )) : (
-              <p className="text-xs text-slate-300 text-center py-10">No scores recorded yet</p>
-            )}
-            <Link href="/dashboard/teacher/results" className="block">
-              <button className="w-full py-4 mt-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.98]">
-                View Full Results
-              </button>
+              )) : (
+                <p className="text-xs text-slate-300 text-center py-10">No scores recorded yet</p>
+              )}
+            </div>
+          </div>
+          <Link href="/dashboard/teacher/results" className="block mt-4">
+            <button className="w-full py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.98]">
+              View Full Results
+            </button>
+          </Link>
+        </div>
+
+        {/* Quick Tools */}
+        <div className="bg-white rounded-[2rem] md:rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col p-6 md:p-8">
+          <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-3">
+            <span className="p-1.5 bg-indigo-50 text-indigo-500 rounded-lg"><LuClock size={16}/></span> Workflow Tools
+          </h3>
+          <div className="space-y-3 flex-1 flex flex-col justify-center">
+            <Link href="/dashboard/teacher/question-bank/create" className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50/50 hover:border-indigo-100 border border-transparent transition-all group">
+              <div className="w-10 h-10 rounded-xl bg-white shadow-sm text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"><LuFolder size={18}/></div>
+              <div><p className="text-sm font-bold text-slate-800">Add Questions</p><p className="text-[10px] text-slate-500 font-medium mt-0.5">Build your exam bank</p></div>
+            </Link>
+            <Link href="/dashboard/teacher/students/add" className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50/50 hover:border-emerald-100 border border-transparent transition-all group">
+              <div className="w-10 h-10 rounded-xl bg-white shadow-sm text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"><LuUsers size={18}/></div>
+              <div><p className="text-sm font-bold text-slate-800">Invite Students</p><p className="text-[10px] text-slate-500 font-medium mt-0.5">Manage classes</p></div>
+            </Link>
+            <Link href="/dashboard/teacher/results" className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 hover:bg-amber-50/50 hover:border-amber-100 border border-transparent transition-all group">
+              <div className="w-10 h-10 rounded-xl bg-white shadow-sm text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"><LuSettings size={18}/></div>
+              <div><p className="text-sm font-bold text-slate-800">Review Submissions</p><p className="text-[10px] text-slate-500 font-medium mt-0.5">Grade pending tests</p></div>
             </Link>
           </div>
         </div>
@@ -251,8 +274,8 @@ export default function TeacherPage() {
             <h4 className="text-xl md:text-2xl font-black leading-tight">
               Teacher Statistics
             </h4>
-            <p className="text-sm text-white/80 font-medium mt-3 leading-relaxed max-w-xs">
-              Ensure all results are verified in the review center to keep student leaderboards up-to-date.
+            <p className="text-sm text-white/80 font-medium mt-3 leading-relaxed">
+              Ensure all results are verified in the review center to keep student leaderboards up-to-date and maintain accuracy.
             </p>
           </div>
           <Link href="/dashboard/teacher/results">
@@ -260,7 +283,7 @@ export default function TeacherPage() {
               Verify Results
             </button>
           </Link>
-          <div className="absolute bottom-0 right-0 -mb-10 -mr-10 w-40 h-40 bg-white/10 blur-[50px] rounded-full"></div>
+          <div className="absolute bottom-0 right-0 -mb-10 -mr-10 w-40 h-40 bg-white/10 blur-[50px] rounded-full pointer-events-none"></div>
         </div>
       </div>
 

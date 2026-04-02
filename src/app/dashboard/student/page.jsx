@@ -205,47 +205,77 @@ export default function StudentDashboard() {
         ))}
       </div>
 
-      {/* UPCOMING EXAMS */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-          <h3 className="text-lg md:text-xl font-black text-slate-800 flex items-center gap-3">
-            <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
-            Upcoming Exams
-          </h3>
-          <Link href="/dashboard/student/my_exam" className="text-xs font-bold text-primary hover:underline uppercase tracking-widest">View All</Link>
+      {/* UPCOMING EXAMS AND UPDATES */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+          <div className="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+            <h3 className="text-lg md:text-xl font-black text-slate-800 flex items-center gap-3">
+              <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
+              Upcoming Exams
+            </h3>
+            <Link href="/dashboard/student/my_exam" className="text-xs font-bold text-primary hover:underline uppercase tracking-widest">View All</Link>
+          </div>
+
+          <div className="p-6 md:p-8 space-y-4">
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2].map(i => <div key={i} className="h-20 bg-slate-100 rounded-2xl animate-pulse"></div>)}
+              </div>
+            ) : upcomingExams.length === 0 ? (
+              <div className="text-center py-12">
+                <LuCalendar size={40} className="text-slate-200 mx-auto mb-4" />
+                <p className="text-slate-400 font-black">No upcoming exams scheduled</p>
+                {myClasses.length === 0 && <p className="text-slate-300 text-sm mt-1">Join a class to see your exams</p>}
+              </div>
+            ) : (
+              upcomingExams.map(exam => (
+                <div key={exam._id} className="p-5 md:p-6 rounded-[1.5rem] border border-slate-100 bg-white hover:border-primary/20 hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase">{exam.status}</span>
+                    <h4 className="text-lg font-black text-slate-800">{exam.title}</h4>
+                    <p className="text-xs text-slate-400 font-bold flex items-center gap-2">
+                      <LuCalendar size={12} />
+                      {exam.scheduledAt ? new Date(exam.scheduledAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'TBD'}
+                      &nbsp;•&nbsp;<LuClock size={12} /> {exam.duration} min
+                    </p>
+                  </div>
+                  <Link href="/dashboard/student/my_exam">
+                    <button className="flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary rounded-xl font-bold text-sm hover:bg-primary hover:text-white transition-all whitespace-nowrap">
+                      <LuPlay size={14} /> Enter Exam
+                    </button>
+                  </Link>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
-        <div className="p-6 md:p-8 space-y-4">
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2].map(i => <div key={i} className="h-20 bg-slate-100 rounded-2xl animate-pulse"></div>)}
-            </div>
-          ) : upcomingExams.length === 0 ? (
-            <div className="text-center py-12">
-              <LuCalendar size={40} className="text-slate-200 mx-auto mb-4" />
-              <p className="text-slate-400 font-black">No upcoming exams scheduled</p>
-              {myClasses.length === 0 && <p className="text-slate-300 text-sm mt-1">Join a class to see your exams</p>}
-            </div>
-          ) : (
-            upcomingExams.map(exam => (
-              <div key={exam._id} className="p-5 md:p-6 rounded-[1.5rem] border border-slate-100 bg-white hover:border-primary/20 hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase">{exam.status}</span>
-                  <h4 className="text-lg font-black text-slate-800">{exam.title}</h4>
-                  <p className="text-xs text-slate-400 font-bold flex items-center gap-2">
-                    <LuCalendar size={12} />
-                    {exam.scheduledAt ? new Date(exam.scheduledAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'TBD'}
-                    &nbsp;•&nbsp;<LuClock size={12} /> {exam.duration} min
-                  </p>
-                </div>
-                <Link href="/dashboard/student/my_exam">
-                  <button className="flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary rounded-xl font-bold text-sm hover:bg-primary hover:text-white transition-all whitespace-nowrap">
-                    <LuPlay size={14} /> Enter Exam
-                  </button>
-                </Link>
+        {/* LATEST ANNOUNCEMENTS */}
+        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+          <div className="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+            <h3 className="text-base md:text-lg font-black text-slate-800 flex items-center gap-3">
+              <div className="p-2 bg-blue-100 text-blue-600 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46" />
+                </svg>
               </div>
-            ))
-          )}
+              Updates
+            </h3>
+          </div>
+          <div className="p-5 md:p-6 space-y-4 flex-1 bg-slate-50/20">
+             <div className="p-4 rounded-[1.5rem] bg-blue-50/80 border border-blue-100 hover:shadow-md transition-all group cursor-pointer">
+               <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1.5 block">New Feature</span>
+               <p className="text-xs font-bold text-slate-700 leading-relaxed group-hover:text-blue-800 transition-colors">Detailed Analytics are now available for all your completed exams in the results tab.</p>
+             </div>
+             <div className="p-4 rounded-[1.5rem] bg-amber-50/80 border border-amber-100 hover:shadow-md transition-all group cursor-pointer">
+               <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1.5 block">Maintenance</span>
+               <p className="text-xs font-bold text-slate-700 leading-relaxed group-hover:text-amber-800 transition-colors">Scheduled server maintenance this Sunday at 2 AM EST. Avoid joining exams then.</p>
+             </div>
+             <div className="p-4 rounded-[1.5rem] bg-emerald-50/80 border border-emerald-100 hover:shadow-md transition-all group cursor-pointer">
+               <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1.5 block">Study Tip</span>
+               <p className="text-xs font-bold text-slate-700 leading-relaxed group-hover:text-emerald-800 transition-colors">Consistently taking practice exams improves topic retention by 40%.</p>
+             </div>
+          </div>
         </div>
       </div>
 
