@@ -96,7 +96,7 @@ export default function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="mb-4 w-80 sm:w-96 h-[30rem] bg-base-100 rounded-2xl shadow-2xl border border-base-300 flex flex-col overflow-hidden"
+            className="mb-4 w-80 sm:w-96 h-[30rem] bg-base-100 rounded-2xl shadow-2xl border border-base-100 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-primary text-primary-content p-4 flex justify-between items-center shadow-md z-10">
@@ -183,7 +183,7 @@ export default function Chatbot() {
                         <FaRobot />
                       </div>
                     </div>
-                    <div className="bg-base-100 border border-base-300 shadow-sm rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1">
+                    <div className="bg-base-100 border border-base-100 shadow-sm rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1">
                       <motion.div
                         className="w-1.5 h-1.5 bg-base-content/50 rounded-full"
                         animate={{ y: [0, -4, 0] }}
@@ -223,7 +223,7 @@ export default function Chatbot() {
                 <input
                   type="text"
                   placeholder="Type your message..."
-                  className="input input-bordered flex-1 focus:outline-none focus:border-primary rounded-full px-5 bg-base-200/50"
+                  className="input input-bordered border-base-300 flex-1 focus:outline-none focus:border-primary rounded-full px-5 bg-base-200/50"
                   value={inputMessage}
                   onChange={e => setInputMessage(e.target.value)}
                   disabled={isTyping}
@@ -248,7 +248,7 @@ export default function Chatbot() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={toggleChat}
-        className="btn btn-primary h-14 w-14 rounded-full shadow-xl flex items-center justify-center text-2xl z-50 fixed bottom-6 right-6 border-4 border-base-100"
+        className="btn btn-primary h-14 w-14 rounded-full shadow-xl flex items-center justify-center text-2xl z-50 fixed bottom-1 right-6 border-4 border-base-100"
         aria-label="Open chat"
       >
         <AnimatePresence mode="wait">

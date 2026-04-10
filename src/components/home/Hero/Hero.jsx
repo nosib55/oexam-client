@@ -1,7 +1,7 @@
 const Hero = () => {
   return (
     <div>
-      <section className="relative flex items-center bg-base-100 md:my-40 my-20">
+      <section className="relative flex items-center md:my-40 my-20">
         {/* Background Decoration */}
         <div className="absolute top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full"></div>
 
