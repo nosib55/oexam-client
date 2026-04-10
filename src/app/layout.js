@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import LoadingWrapper from '@/components/shared/LoadingWrapper';
+import Chatbot from '@/components/shared/Chatbot';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -10,6 +11,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} !overflow-x-hidden`}>
         <LoadingWrapper>
           {children}
+          <Chatbot/>
         </LoadingWrapper>
       </body>
     </html>
