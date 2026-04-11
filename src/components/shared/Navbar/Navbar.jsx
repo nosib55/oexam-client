@@ -26,6 +26,20 @@ const Navbar = () => {
     }
   }, []);
 
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "Welcome to O-Exam!",
+      description: "Start your first exam today and track progress.",
+      time: "Just now",
+      icon: "🚀"
+    }
+  ]);
+
+  const clearNotifications = () => {
+    setNotifications([]);
+  };
+
   const navRoutes = [
     { name: "Home", href: "/", icon: "🏠" },
     { name: "How it works", href: "#how-it-works", icon: "⚙️" },
@@ -130,12 +144,14 @@ const Navbar = () => {
                   />
                 </svg>
                 {/*  */}
-                <span className="indicator-item flex h-4 w-4">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-4 w-4 bg-primary text-[10px] font-black text-white items-center justify-center">
-                    1
+                {notifications.length > 0 && (
+                  <span className="indicator-item flex h-4 w-4">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-primary text-[10px] font-black text-white items-center justify-center">
+                      {notifications.length}
+                    </span>
                   </span>
-                </span>
+                )}
               </div>
             </button>
 
@@ -149,36 +165,55 @@ const Navbar = () => {
                   <h3 className="font-black text-primary text-sm uppercase tracking-wider">
                     Notifications
                   </h3>
-                  <span className="badge badge-primary badge-sm font-bold text-white p-2">
-                    New
-                  </span>
+                  {notifications.length > 0 && (
+                    <span className="badge badge-primary badge-sm font-bold text-white p-2">
+                      New
+                    </span>
+                  )}
                 </div>
 
                 <div className="max-h-64 overflow-y-auto px-2 py-3 space-y-1">
-                  {/*  */}
-                  <div className="flex items-start gap-3 p-3 hover:bg-base-200/50 rounded-2xl transition-all cursor-pointer group">
-                    <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
-                      🚀
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className="flex items-start gap-3 p-3 hover:bg-base-200/50 rounded-2xl transition-all cursor-pointer group"
+                      >
+                        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
+                          {notification.icon}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-base-content leading-tight">
+                            {notification.title}
+                          </p>
+                          <p className="text-[11px] text-base-content/60 mt-1">
+                            {notification.description}
+                          </p>
+                          <p className="text-[9px] font-black text-primary uppercase mt-1.5 opacity-60">
+                            {notification.time}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-10 text-center">
+                      <p className="text-sm font-bold text-base-content/40">
+                        No notifications
+                      </p>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-base-content leading-tight">
-                        Welcome to O-Exam!
-                      </p>
-                      <p className="text-[11px] text-base-content/60 mt-1">
-                        Start your first exam today and track progress.
-                      </p>
-                      <p className="text-[9px] font-black text-primary uppercase mt-1.5 opacity-60">
-                        Just now
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                <div className="p-2 border-t border-base-200">
-                  <button className="btn btn-ghost btn-sm w-full rounded-xl font-bold text-xs hover:bg-primary/10">
-                    Clear All Notifications
-                  </button>
-                </div>
+                {notifications.length > 0 && (
+                  <div className="p-2 border-t border-base-200">
+                    <button
+                      onClick={clearNotifications}
+                      className="btn btn-ghost btn-sm w-full rounded-xl font-bold text-xs hover:bg-primary/10"
+                    >
+                      Clear All Notifications
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
