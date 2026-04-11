@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 
 const Integration = () => {
   const tools = [
-    { name: 'Question Bank', icon: '📚' },
-    { name: 'Auto Grading', icon: '⚡' },
-    { name: 'Proctoring', icon: '🎥' },
-    { name: 'Analytics', icon: '📊' },
-    { name: 'Certificates', icon: '🏆' },
-    { name: 'Results', icon: '🧾' },
+    { name: "Question Bank", icon: "📕" },
+    { name: "Auto Grading", icon: "🈴" },
+    { name: "Proctoring", icon: "👮🏻‍♂️" },
+    { name: "Analytics", icon: "📊" },
+    { name: "Certificates", icon: "📄" },
+    { name: "Results", icon: "🧾" },
   ];
 
   return (
@@ -22,15 +22,12 @@ const Integration = () => {
             <h2 className="text-4xl md:text-7xl font-black leading-[1.1] tracking-tighter">
               Smart
               <br />
-              <span className="text-primary italic">Exam System</span>
+              <span className="text-primary">Exam System</span>
             </h2>
             <p className="text-base-content/60 text-lg max-w-lg leading-relaxed font-medium">
               A centralized platform for managing exams, monitoring students,
               and generating results with complete automation.
             </p>
-            <button className="btn btn-primary btn-lg px-10 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-105 transition-all">
-              EXPLORE SYSTEM
-            </button>
           </div>
 
           {/* RIGHT HUB LAYOUT (Modernized) */}
@@ -76,7 +73,7 @@ const Integration = () => {
               <div className="relative group">
                 <div className="absolute -inset-4 bg-primary/20 rounded-[3rem] blur-xl group-hover:bg-primary/30 transition-all"></div>
                 <div className="w-32 h-32 rounded-[2.5rem] bg-slate-900 text-white flex items-center justify-center text-5xl shadow-2xl relative z-10 border-4 border-white">
-                  🎓
+                  👨🏻‍🎓
                 </div>
               </div>
 

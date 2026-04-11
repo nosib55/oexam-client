@@ -1,27 +1,27 @@
-import React from 'react';
+import React from "react";
 
 const Testimonials = () => {
   const reviews = [
     {
-      name: 'Dr. Sarah Jenkins',
-      role: 'Dean, Oxford Academy',
-      image: 'https://i.pravatar.cc/150?u=sarah',
+      name: "Dr. Sarah Jenkins",
+      role: "Dean, Oxford Academy",
+      image: "https://i.ibb.co.com/VcBGDkVQ/download-1.png",
       comment:
         "The AI eye-tracking feature is a game-changer. We've seen a 40% reduction in academic dishonesty since switching to EXAMINERLY.",
       rating: 5,
     },
     {
-      name: 'Marcus Thorne',
-      role: 'E-Learning Specialist',
-      image: 'https://i.pravatar.cc/150?u=marcus',
+      name: "Marcus Thorne",
+      role: "E-Learning Specialist",
+      image: "https://i.ibb.co.com/VcBGDkVQ/download-1.png",
       comment:
-        'Seamless integration with our existing LMS. The instant report generation saves our faculty hundreds of hours every semester.',
+        "Seamless integration with our existing LMS. The instant report generation saves our faculty hundreds of hours every semester.",
       rating: 5,
     },
     {
-      name: 'Elena Rodriguez',
-      role: 'Online Instructor',
-      image: 'https://i.pravatar.cc/150?u=elena',
+      name: "Elena Rodriguez",
+      role: "Online Instructor",
+      image: "https://i.ibb.co.com/VcBGDkVQ/download-1.png",
       comment:
         "The most intuitive interface I've ever used. Even my less tech-savvy students find it incredibly easy to navigate.",
       rating: 4,
@@ -38,8 +38,8 @@ const Testimonials = () => {
               Reviews
             </span>
             <h2 className="text-4xl md:text-6xl font-black text-base-content tracking-tighter leading-tight">
-              Trusted by <br />{' '}
-              <span className="text-primary italic">Global</span> Educators
+              Trusted by <br /> <span className="text-primary">Global</span>{" "}
+              Educators
             </h2>
           </div>
           <p className="text-base-content/50 font-bold max-w-sm">
@@ -65,7 +65,7 @@ const Testimonials = () => {
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-4 h-4 ${i < review.rating ? 'text-amber-400' : 'text-base-300'}`}
+                    className={`w-4 h-4 ${i < review.rating ? "text-amber-400" : "text-base-300"}`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -76,7 +76,7 @@ const Testimonials = () => {
 
               {/* Comment */}
               <p className="text-base-content/70 font-medium leading-relaxed mb-8 italic">
-                &quotl;{review.comment}&quot;
+                &quot;{review.comment}&quot;
               </p>
 
               {/* User Info */}
