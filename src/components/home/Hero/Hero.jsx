@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const Hero = () => {
   return (
     <div>
@@ -20,9 +22,9 @@ const Hero = () => {
               real-time tracking, instant results, and expert-curated questions.
             </p>
             <div className="flex gap-4">
-              <button className="btn btn-primary md:btn-lg rounded-2xl shadow-xl shadow-primary/20 px-8 font-black uppercase">
+              <Link href={'/auth/login'}  className="btn btn-primary md:btn-lg rounded-2xl shadow-xl shadow-primary/20 px-8 font-black uppercase">
                 Get Started
-              </button>
+              </Link>
               <button className="btn btn-outline btn-primary md:btn-lg rounded-2xl px-8 font-black uppercase italic">
                 Watch Demo
               </button>
